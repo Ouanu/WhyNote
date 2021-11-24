@@ -2,6 +2,7 @@ package com.moment.whynote.fragment;
 
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ResFragment extends Fragment {
-//    private final static String TAG = "ResFragment.class";
+    private final static String TAG = "ResFragment.class";
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
@@ -54,7 +55,7 @@ public class ResFragment extends Fragment {
     /**
      * Holder
      */
-    static class ResHolder extends RecyclerView.ViewHolder{
+    static class ResHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ResHolder(@NonNull @NotNull View itemView) {
             super(itemView);
         }
@@ -62,9 +63,17 @@ public class ResFragment extends Fragment {
         TextView tv_title = itemView.findViewById(R.id.tv_title);
         TextView tv_desc = itemView.findViewById(R.id.tv_desc);
 
+
+
         public void bind(ResData data){
             tv_title.setText(data.title);
             tv_desc.setText(data.desc);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "ResFragment item got Click " + tv_title.getText().toString());
         }
     }
 

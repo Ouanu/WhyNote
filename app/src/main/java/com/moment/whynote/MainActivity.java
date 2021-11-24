@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.fragment.InsertFragment;
 import com.moment.whynote.fragment.ResFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -67,12 +68,8 @@ public class MainActivity extends AppCompatActivity {
         FrameLayout flFragment = (FrameLayout) findViewById(R.id.fl_fragment);
         ImageButton insertBtn =  findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(v -> new Thread(() -> {
-            repository = ResRepository.getInstance();
-            ResData resData = new ResData();
-            resData.title = "SAD";
-            resData.desc = "SAD";
-            resData.uri = "SDADSADA";
-            repository.insertData(resData);
+            InsertFragment fragment = new InsertFragment();
+            fragment.show(getSupportFragmentManager(), "INSERT_FRAGMENT");
         }).start());
     }
 
