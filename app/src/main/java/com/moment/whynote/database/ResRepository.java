@@ -32,18 +32,23 @@ public class ResRepository {
         if(mContext == null){
             Log.d(TAG, "ResRepository: context is null");
         }
-        /**
-         * 创建数据库
+        /*
+          创建数据库
          */
         ResDatabase database = Room.databaseBuilder(mContext,
                 ResDatabase.class,
                 DATABASE_NAME).build();
-        /**
-         * 获取Dao
+        /*
+          获取Dao
          */
         dao = database.resDao();
     }
 
+    /**
+     * 单例模式
+     * 静态加载实例
+     * @return 返回实例
+     */
     public static ResRepository getInstance(){
         if(instance == null) {
             synchronized (ResRepository.class) {
@@ -55,10 +60,16 @@ public class ResRepository {
         return instance;
     }
 
+    /**
+     * @return 获取所有数据
+     */
     public LiveData<List<ResData>> getAllResData() {
         return dao.getAll();
     }
 
+    /**
+     * @param resData 插入数据
+     */
     public void insertData(ResData resData){
         dao.insertResData(resData);
     }
