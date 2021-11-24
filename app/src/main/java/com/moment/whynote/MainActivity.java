@@ -7,6 +7,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initView() {
         FrameLayout flFragment = (FrameLayout) findViewById(R.id.fl_fragment);
-        Button insertBtn = (Button) findViewById(R.id.insert_btn);
+        ImageButton insertBtn =  findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(v -> new Thread(() -> {
             repository = ResRepository.getInstance();
             ResData resData = new ResData();
