@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Button;
+
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
@@ -17,13 +17,17 @@ import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.InsertFragment;
 import com.moment.whynote.fragment.ResFragment;
+import com.moment.whynote.utils.DataUtils;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements InsertFragment.DialogListener{
 
     private ResRepository repository;
     private final MainHandler handler = new MainHandler();
     private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
+    private DataUtils utils = new DataUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +35,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         getResRepository();
-
-
-
     }
 
     /**
@@ -85,5 +86,25 @@ public class MainActivity extends AppCompatActivity {
                 getFragment();
             }
         }
+    }
+
+    @Override
+    public void sendValue(String str) {
+        Log.d(TAG, "sendValue: " + str);
+        List<String> res = utils.getUris(str);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ResData data = new ResData();
+                repository = ResRepository.getInstance();
+                data.title = String.valueOf(System.currentTimeMillis());
+                for (String re : res) {
+                    Log.d(TAG, "run: ---------" + re);
+                    data.desc += re + "\r\n";
+                }
+                repository.insertData(data);
+            }
+        }).start();
+
     }
 }

@@ -18,7 +18,7 @@ public class ResData {
     public String title;
 
     @ColumnInfo(name="desc")
-    public String desc;
+    public String desc="";
 
     @ColumnInfo(name="uri")
     public String uri;
