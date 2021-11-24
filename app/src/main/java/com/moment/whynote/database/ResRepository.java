@@ -24,7 +24,7 @@ public class ResRepository {
 
     /**
      * 构造函数
-     * @param context
+     * @param context 获取上下文
      */
     public ResRepository(Context context) {
         Log.d(TAG, "ResRepository: ");
@@ -32,9 +32,15 @@ public class ResRepository {
         if(mContext == null){
             Log.d(TAG, "ResRepository: context is null");
         }
+        /**
+         * 创建数据库
+         */
         ResDatabase database = Room.databaseBuilder(mContext,
                 ResDatabase.class,
                 DATABASE_NAME).build();
+        /**
+         * 获取Dao
+         */
         dao = database.resDao();
     }
 
