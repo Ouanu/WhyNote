@@ -19,6 +19,8 @@ import com.moment.whynote.fragment.InsertFragment;
 import com.moment.whynote.fragment.ResFragment;
 import com.moment.whynote.utils.DataUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements InsertFragment.DialogListener{
@@ -97,7 +99,9 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
             public void run() {
                 ResData data = new ResData();
                 repository = ResRepository.getInstance();
-                data.title = String.valueOf(System.currentTimeMillis());
+                Date date = new Date();
+                SimpleDateFormat mat = new SimpleDateFormat("yyyy-MM-dd-E HH:mm:ss");
+                data.title = mat.format(date);
                 for (String re : res) {
                     Log.d(TAG, "run: ---------" + re);
                     data.desc += re + "\r\n";
