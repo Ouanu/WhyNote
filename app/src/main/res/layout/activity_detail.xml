@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".DetailActivity">
+    android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:id="@+id/et_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:text="Hello World!"
+        android:textSize="38sp"
+        android:textColor="@color/black" />
+
+    <EditText
+        android:id="@+id/et_desc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@+id/fl_uri"
+        android:gravity="start"
+        android:background="@drawable/et_bg"/>
+
+    <ImageButton
+        android:id="@+id/btn_get_url"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="30dp"
+        android:src="@drawable/ic_baseline_web_asset_24"
+        android:scaleType="fitCenter"
+        android:background="@drawable/ib_selector_bg"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+   <FrameLayout
+       android:id="@+id/fl_uri"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/et_title"/>
+
+</RelativeLayout>

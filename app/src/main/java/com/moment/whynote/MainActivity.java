@@ -99,9 +99,7 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
             public void run() {
                 ResData data = new ResData();
                 repository = ResRepository.getInstance();
-                Date date = new Date();
-                SimpleDateFormat mat = new SimpleDateFormat("yyyy-MM-dd-E HH:mm:ss");
-                data.title = mat.format(date);
+                data.title = utils.getNowDateDefault();
                 for (String re : res) {
                     Log.d(TAG, "run: ---------" + re);
                     data.desc += re + "\r\n";
