@@ -1,5 +1,6 @@
 package com.moment.whynote.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -28,6 +29,21 @@ public class ResFragment extends Fragment {
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
 
+    public interface ResListener {
+        public void onFragmentSelected(Bundle bundle);
+    }
+
+    private static ResListener resCallback;
+
+    @Override
+    public void onAttach(@NonNull @NotNull Context context) {
+        super.onAttach(context);
+        try {
+            resCallback = (ResListener) context;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -44,6 +60,7 @@ public class ResFragment extends Fragment {
 
     /**
      * 监听Livedata<List<ResData>>,当数据发生变化时，更新UI
+     *
      * @param view fragment视图布局
      */
     @Override
@@ -63,9 +80,7 @@ public class ResFragment extends Fragment {
         TextView tv_title = itemView.findViewById(R.id.tv_title);
         TextView tv_desc = itemView.findViewById(R.id.tv_desc);
 
-
-
-        public void bind(ResData data){
+        public void bind(ResData data) {
             tv_title.setText(data.title);
             tv_desc.setText(data.desc);
             itemView.setOnClickListener(this);
@@ -73,7 +88,10 @@ public class ResFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "ResFragment item got Click " + tv_title.getText().toString());
+            Bundle bundle = new Bundle();
+            bundle.putString("title", tv_title.getText().toString());
+            bundle.putString("desc", tv_desc.getText().toString());
+            resCallback.onFragmentSelected(bundle);
         }
     }
 
@@ -109,6 +127,7 @@ public class ResFragment extends Fragment {
 
     /**
      * 更新UI
+     *
      * @param dataList 数据列表
      */
     private void updateUI(List<ResData> dataList) {

@@ -16,9 +16,10 @@ import com.moment.whynote.R;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements View.OnClickListener {
     private EditText etTitle;
     private EditText etDesc;
+
     private ImageButton btnGetUrl;
     private FrameLayout flUri;
 
@@ -27,11 +28,27 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.detail_fragment, container, false);
-        etTitle = view.findViewById(R.id.et_title);
-        etDesc = view.findViewById(R.id.et_desc);
-        btnGetUrl = view.findViewById(R.id.btn_get_url);
-        flUri = view.findViewById(R.id.fl_uri);
+        initView(view);
+
+
+
         return view;
     }
 
+    private void initView(View view) {
+        Bundle bundle = getArguments();
+        etTitle = (EditText)view.findViewById(R.id.et_title);
+        etDesc = view.findViewById(R.id.et_desc);
+        btnGetUrl = view.findViewById(R.id.btn_get_uri);
+        flUri = view.findViewById(R.id.fl_uri);
+        etTitle.setText(bundle.getString("title"));
+        etDesc.setText(bundle.getString("desc"));
+        btnGetUrl.setOnClickListener(this);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+
+    }
 }

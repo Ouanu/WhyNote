@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.InsertFragment;
 import com.moment.whynote.fragment.ResFragment;
 import com.moment.whynote.utils.DataUtils;
@@ -23,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements InsertFragment.DialogListener{
+public class MainActivity extends AppCompatActivity implements InsertFragment.DialogListener, ResFragment.ResListener{
 
     private ResRepository repository;
     private final MainHandler handler = new MainHandler();
@@ -74,6 +75,17 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
             InsertFragment fragment = new InsertFragment();
             fragment.show(getSupportFragmentManager(), "INSERT_FRAGMENT");
         }).start());
+
+    }
+
+    @Override
+    public void onFragmentSelected(Bundle bundle) {
+        DetailFragment detailFragment = new DetailFragment();
+        detailFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fl_fragment, detailFragment)
+                .addToBackStack("detailFragment")
+                .commit();
     }
 
     /**
@@ -93,17 +105,14 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
     @Override
     public void sendValue(String str) {
         Log.d(TAG, "sendValue: " + str);
-        List<String> res = utils.getUris(str);
+//        List<String> res = utils.getUris(str);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 ResData data = new ResData();
                 repository = ResRepository.getInstance();
                 data.title = utils.getNowDateDefault();
-                for (String re : res) {
-                    Log.d(TAG, "run: ---------" + re);
-                    data.desc += re + "\r\n";
-                }
+                data.desc = str;
                 repository.insertData(data);
             }
         }).start();
