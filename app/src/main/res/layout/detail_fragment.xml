@@ -39,6 +39,7 @@
         android:inputType="textNoSuggestions"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"/>
+
     <ImageButton
         android:id="@+id/btn_edit"
         android:layout_width="50dp"

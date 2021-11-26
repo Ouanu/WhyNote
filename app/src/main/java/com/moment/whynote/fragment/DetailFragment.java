@@ -1,9 +1,7 @@
 package com.moment.whynote.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -25,6 +23,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     private ImageButton btnGetUrl;
     private FrameLayout flUri;
+    private ImageButton btnGetUri;
+    private ImageButton btnEdit;
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -34,13 +34,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         initView(view);
 
 
-
         return view;
     }
 
     private void initView(View view) {
         Bundle bundle = getArguments();
-        etTitle = (EditText)view.findViewById(R.id.et_title);
+        etTitle = (EditText) view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
         btnGetUrl = view.findViewById(R.id.btn_get_uri);
         flUri = view.findViewById(R.id.fl_uri);
@@ -48,17 +47,18 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         etDesc.setText(bundle.getString("desc"));
         etDesc.setOnClickListener(this);
         btnGetUrl.setOnClickListener(this);
+        btnEdit = view.findViewById(R.id.btn_edit);
+        btnEdit.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.et_desc) {
+        if (v.getId() == R.id.btn_edit) {
             etDesc.setFocusable(true);
             etDesc.setFocusableInTouchMode(true);
             etDesc.requestFocus();
             etDesc.requestFocusFromTouch();
-
         }
     }
 
