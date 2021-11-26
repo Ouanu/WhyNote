@@ -23,7 +23,9 @@
         android:paddingHorizontal="10dp"
         android:paddingVertical="10dp"
         android:gravity="start"
-        android:background="@drawable/et_bg"/>
+        android:background="@drawable/et_bg"
+        android:focusable="false"
+        android:clickable="true"/>
 
     <ImageButton
         android:id="@+id/btn_get_uri"

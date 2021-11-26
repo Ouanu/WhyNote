@@ -1,7 +1,9 @@
 package com.moment.whynote.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -17,6 +19,7 @@ import com.moment.whynote.R;
 import org.jetbrains.annotations.NotNull;
 
 public class DetailFragment extends Fragment implements View.OnClickListener {
+    private final static String TAG = "DetailFragment";
     private EditText etTitle;
     private EditText etDesc;
 
@@ -43,12 +46,21 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         flUri = view.findViewById(R.id.fl_uri);
         etTitle.setText(bundle.getString("title"));
         etDesc.setText(bundle.getString("desc"));
+        etDesc.setOnClickListener(this);
         btnGetUrl.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.et_desc) {
+            etDesc.setFocusable(true);
+            etDesc.setFocusableInTouchMode(true);
+            etDesc.requestFocus();
+            etDesc.requestFocusFromTouch();
 
+        }
     }
+
+
 }
