@@ -1,6 +1,9 @@
 package com.moment.whynote.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +14,11 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 public class DetailFragment extends Fragment implements View.OnClickListener {
     private final static String TAG = "DetailFragment";
@@ -95,15 +102,24 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private class UriHolder extends RecyclerView.ViewHolder {
+    private class UriHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public UriHolder(@NonNull @NotNull View itemView) {
             super(itemView);
+            textView.setOnClickListener(this);
         }
-
         TextView textView = itemView.findViewById(R.id.tv_uri);
-
         private void bind(String uri) {
             textView.setText(uri);
+        }
+
+        @Override
+        public void onClick(View v) {
+            String text = textView.getText().toString();
+            ClipboardManager manager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData mClipData = ClipData.newPlainText("Label", text);
+            manager.setPrimaryClip(mClipData);
+            Toast.makeText(getContext(), text + " 已复制成功", Toast.LENGTH_SHORT).show();
+            Log.i("xxx", "onClick: " + text);
         }
     }
 
