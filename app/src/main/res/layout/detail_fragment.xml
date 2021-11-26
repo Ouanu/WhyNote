@@ -11,7 +11,22 @@
         android:layout_marginHorizontal="20dp"
         android:maxLength="24"
         android:textSize="38sp"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:clickable="true"/>
+
+    <FrameLayout
+        android:id="@+id/fl_uri"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_title"
+        android:focusedByDefault="true"
+        android:focusableInTouchMode="false">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_uris_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="false"/>
+    </FrameLayout>
 
     <EditText
         android:id="@+id/et_desc"
@@ -41,17 +56,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"/>
 
-   <FrameLayout
-       android:id="@+id/fl_uri"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:layout_below="@+id/et_title"
-       android:focusable="true"
-       android:focusableInTouchMode="false">
-       <androidx.recyclerview.widget.RecyclerView
-           android:id="@+id/rv_uris_fragment"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent" />
-   </FrameLayout>
+
 
 </RelativeLayout>

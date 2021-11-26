@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class DetailFragment extends Fragment implements View.OnClickListener {
     private final static String TAG = "DetailFragment";
     private EditText etDesc;
@@ -41,6 +39,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private RecyclerView recyclerView;
     private List<String> uriList = new ArrayList<>();
     private UriAdapter adapter;
+    private EditText etTitle;
+    private FrameLayout flUri;
+    private float lastX = 0.0f;
 
 
     @Nullable
@@ -56,22 +57,48 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     private void initView(View view) {
         Bundle bundle = getArguments();
-        EditText etTitle = (EditText) view.findViewById(R.id.et_title);
+        etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         FrameLayout flUri = view.findViewById(R.id.fl_uri);
         etTitle.setText(bundle.getString("title"));
         etDesc.setText(bundle.getString("desc"));
-        etDescSetOnTouchListener();
+        etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
+        flUri = view.findViewById(R.id.fl_uri);
     }
 
     /**
      * 重写OnTouch事件，触摸滑动不弹出键盘输入，点击才可输入
      */
-    private void etDescSetOnTouchListener() {
+    @SuppressLint("ClickableViewAccessibility")
+    private void etSetOnTouchListener() {
         etDesc.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch: ----" + event.getAction() + "   " + flag);
+
+                if (event.getAction() == 0) {
+                    flag = true;
+                } else if (event.getAction() == 2) {
+
+                    flag = false;
+                    etDesc.setFocusable(false);
+                    Log.d(TAG, "onTouch: " + event.getX());
+
+                } else if (event.getAction() == 1 && flag) {
+                    etDesc.setFocusable(true);
+                    etDesc.setFocusableInTouchMode(true);
+                    etDesc.requestFocus();
+                    etDesc.requestFocusFromTouch();
+                }
+
+
+                return false;
+            }
+        });
+
+        etTitle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d(TAG, "onTouch: ----" + event.getAction() + "   " + flag);
@@ -80,12 +107,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     flag = true;
                 } else if (event.getAction() == 2) {
                     flag = false;
-                    etDesc.setFocusable(false);
+                    etTitle.setFocusable(false);
                 } else if (event.getAction() == 1 && flag) {
-                    etDesc.setFocusable(true);
-                    etDesc.setFocusableInTouchMode(true);
-                    etDesc.requestFocus();
-                    etDesc.requestFocusFromTouch();
+                    etTitle.setFocusable(true);
+                    etTitle.setFocusableInTouchMode(true);
+                    etTitle.requestFocus();
+                    etTitle.requestFocusFromTouch();
                 }
                 return false;
             }
@@ -98,6 +125,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         if (v.getId() == R.id.btn_get_uri) {
             uriList = utils.getUris(etDesc.getText().toString());
             updateUri();
+            recyclerView.requestFocus();
         }
     }
 
@@ -107,13 +135,16 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             super(itemView);
             textView.setOnClickListener(this);
         }
+
         TextView textView = itemView.findViewById(R.id.tv_uri);
+
         private void bind(String uri) {
             textView.setText(uri);
         }
 
         @Override
         public void onClick(View v) {
+            System.out.println("onclick.............");
             String text = textView.getText().toString();
             ClipboardManager manager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData mClipData = ClipData.newPlainText("Label", text);

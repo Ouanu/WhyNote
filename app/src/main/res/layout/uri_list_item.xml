@@ -8,10 +8,15 @@
         android:id="@+id/tv_uri"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:background="@drawable/et_bg"
+        android:paddingHorizontal="10dp"
         android:gravity="center_vertical"
         android:text="TEST"
         android:textColor="@color/purple_500"
         android:textIsSelectable="true"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:focusable="true"
+        android:focusableInTouchMode="false"/>
 
 </LinearLayout>
