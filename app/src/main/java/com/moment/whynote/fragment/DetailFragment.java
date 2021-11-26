@@ -1,7 +1,10 @@
 package com.moment.whynote.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -25,6 +28,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private FrameLayout flUri;
     private ImageButton btnGetUri;
     private ImageButton btnEdit;
+    private boolean flag = false;
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -45,20 +49,40 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         flUri = view.findViewById(R.id.fl_uri);
         etTitle.setText(bundle.getString("title"));
         etDesc.setText(bundle.getString("desc"));
-        etDesc.setOnClickListener(this);
+        etDescSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
         btnEdit = view.findViewById(R.id.btn_edit);
         btnEdit.setOnClickListener(this);
+    }
+
+    private void etDescSetOnTouchListener() {
+        etDesc.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "onTouch: ----" + event.getAction() + "   " + flag);
+
+                if(event.getAction() == 0) {
+                    flag = true;
+                } else if(event.getAction() == 2) {
+                    flag = false;
+                    etDesc.setFocusable(false);
+                } else if(event.getAction() == 1 && flag) {
+                    etDesc.setFocusable(true);
+                    etDesc.setFocusableInTouchMode(true);
+                    etDesc.requestFocus();
+                    etDesc.requestFocusFromTouch();
+                }
+                return false;
+            }
+        });
     }
 
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_edit) {
-            etDesc.setFocusable(true);
-            etDesc.setFocusableInTouchMode(true);
-            etDesc.requestFocus();
-            etDesc.requestFocusFromTouch();
+
         }
     }
 
