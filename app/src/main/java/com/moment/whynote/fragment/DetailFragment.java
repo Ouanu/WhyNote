@@ -27,7 +27,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImageButton btnGetUrl;
     private FrameLayout flUri;
     private ImageButton btnGetUri;
-    private ImageButton btnEdit;
     private boolean flag = false;
 
     @Nullable
@@ -51,8 +50,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         etDesc.setText(bundle.getString("desc"));
         etDescSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
-        btnEdit = view.findViewById(R.id.btn_edit);
-        btnEdit.setOnClickListener(this);
     }
 
     private void etDescSetOnTouchListener() {
@@ -81,9 +78,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btn_edit) {
 
-        }
     }
 
 

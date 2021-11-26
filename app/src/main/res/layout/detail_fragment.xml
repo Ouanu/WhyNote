@@ -41,19 +41,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"/>
 
-    <ImageButton
-        android:id="@+id/btn_edit"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginRight="30dp"
-        android:src="@drawable/ic_baseline_edit_24"
-        android:scaleType="fitCenter"
-        android:background="@drawable/ib_selector_bg"
-        android:inputType="textNoSuggestions"
-        android:layout_alignParentRight="true"
-        android:layout_above="@+id/btn_get_uri"/>
-
    <FrameLayout
        android:id="@+id/fl_uri"
        android:layout_width="match_parent"
