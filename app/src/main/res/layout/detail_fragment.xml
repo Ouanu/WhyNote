@@ -45,6 +45,11 @@
        android:id="@+id/fl_uri"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_below="@+id/et_title"/>
+       android:layout_below="@+id/et_title">
+       <androidx.recyclerview.widget.RecyclerView
+           android:id="@+id/rv_uris_fragment"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"/>
+   </FrameLayout>
 
 </RelativeLayout>

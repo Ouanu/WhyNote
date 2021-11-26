@@ -16,18 +16,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.moment.whynote.R;
+import com.moment.whynote.utils.DataUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DetailFragment extends Fragment implements View.OnClickListener {
     private final static String TAG = "DetailFragment";
-    private EditText etTitle;
     private EditText etDesc;
-
-    private ImageButton btnGetUrl;
-    private FrameLayout flUri;
-    private ImageButton btnGetUri;
     private boolean flag = false;
+    private DataUtils utils = new DataUtils();
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -42,10 +42,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     private void initView(View view) {
         Bundle bundle = getArguments();
-        etTitle = (EditText) view.findViewById(R.id.et_title);
+        EditText etTitle = (EditText) view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
-        btnGetUrl = view.findViewById(R.id.btn_get_uri);
-        flUri = view.findViewById(R.id.fl_uri);
+        ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
+        FrameLayout flUri = view.findViewById(R.id.fl_uri);
         etTitle.setText(bundle.getString("title"));
         etDesc.setText(bundle.getString("desc"));
         etDescSetOnTouchListener();
@@ -78,7 +78,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+        if (v.getId() == R.id.btn_get_uri) {
+            List<String> uris = new ArrayList<>();
+            uris = utils.getUris(etDesc.getText().toString());
+        }
     }
 
 

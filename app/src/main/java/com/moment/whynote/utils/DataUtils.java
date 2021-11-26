@@ -25,7 +25,7 @@ public class DataUtils {
         while (matcher.find()) {
             uriList.add(matcher.group());
         }
-//  We can print its size
+//  We can print its size if necessary.
 //        System.out.println(uriList.size());
         return uriList;
     }
