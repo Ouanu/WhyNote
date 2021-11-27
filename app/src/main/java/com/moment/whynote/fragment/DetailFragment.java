@@ -25,7 +25,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DetailFragment extends Fragment implements View.OnClickListener {
     private final static String TAG = "DetailFragment";
     private EditText etDesc;
