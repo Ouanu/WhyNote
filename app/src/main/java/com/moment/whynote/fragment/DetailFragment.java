@@ -47,8 +47,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private UriAdapter adapter;
     private EditText etTitle;
     private FrameLayout flUri;
-    private float lastX = 0.0f;
-    private Switch btnEdit;
 
     private Method method;
     private Class<EditText> cls = EditText.class;
@@ -76,11 +74,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
         flUri = view.findViewById(R.id.fl_uri);
-        btnEdit = view.findViewById(R.id.btn_edit);
         try {
             method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
             method.setAccessible(true);
             method.invoke(etDesc, false);
+            method.invoke(etTitle, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,40 +94,30 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         etDesc.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "onTouch: ----" + event.getAction() + "   " + flag);
-
                 if (event.getAction() == 0) {
                     flag = true;
                 } else if (event.getAction() == 2) {
-
+                    //触摸事件：不弹出键盘
                     flag = false;
                     try {
                         method.invoke(etDesc, false);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    Log.d(TAG, "onTouch: " + event.getX());
-
-
                 } else if (event.getAction() == 1 && flag) {
+                    //点击事件，弹出键盘
                     try {
                         method.invoke(etDesc, true);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-
-
                 return false;
             }
         });
 
 
-
+        //同上
         etTitle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -139,12 +127,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     flag = true;
                 } else if (event.getAction() == 2) {
                     flag = false;
-                    etTitle.setFocusable(false);
+                    try {
+                        method.invoke(etTitle, false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else if (event.getAction() == 1 && flag) {
-                    etTitle.setFocusable(true);
-                    etTitle.setFocusableInTouchMode(true);
-                    etTitle.requestFocus();
-                    etTitle.requestFocusFromTouch();
+                    try {
+                        method.invoke(etTitle, true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 return false;
             }
