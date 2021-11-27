@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethod;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -29,6 +31,8 @@ import com.moment.whynote.utils.DataUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +49,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private FrameLayout flUri;
     private float lastX = 0.0f;
     private Switch btnEdit;
+
+    private Method method;
+    private Class<EditText> cls = EditText.class;
 
 
     @Nullable
@@ -70,6 +77,15 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         btnGetUrl.setOnClickListener(this);
         flUri = view.findViewById(R.id.fl_uri);
         btnEdit = view.findViewById(R.id.btn_edit);
+        try {
+            method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
+            method.setAccessible(true);
+            method.invoke(etDesc, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     /**
@@ -87,15 +103,24 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 } else if (event.getAction() == 2) {
 
                     flag = false;
-                    etDesc.setFocusable(false);
+                    try {
+                        method.invoke(etDesc, false);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                     Log.d(TAG, "onTouch: " + event.getX());
 
 
                 } else if (event.getAction() == 1 && flag) {
-                    etDesc.setFocusable(true);
-                    etDesc.setFocusableInTouchMode(true);
-                    etDesc.requestFocus();
-                    etDesc.requestFocusFromTouch();
+                    try {
+                        method.invoke(etDesc, true);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
