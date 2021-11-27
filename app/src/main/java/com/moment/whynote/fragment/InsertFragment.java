@@ -18,32 +18,46 @@ import com.moment.whynote.R;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
+/**
+ * 添加文本弹窗，一键粘贴复制
+ * 自定义弹窗
+ */
 public class InsertFragment extends DialogFragment implements View.OnClickListener {
 
     private EditText etString;
-    private Button btnConfirm;
 
+    /**
+     * 回调接口
+     */
     public interface DialogListener {
-        public void sendValue(String str);
+        void sendValue(String str);
     }
 
     private DialogListener dialogListener;
 
 
+    /**
+     *将fragment与activity建立关联
+     */
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
         dialogListener = (DialogListener) getActivity();
     }
 
+    /**
+     * @return 自定义布局
+     */
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.insert_fragment, container, false);
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         etString = view.findViewById(R.id.et_string);
-        btnConfirm = view.findViewById(R.id.btn_confirm);
+        Button btnConfirm = view.findViewById(R.id.btn_confirm);
         btnConfirm.setOnClickListener(this);
         return view;
     }

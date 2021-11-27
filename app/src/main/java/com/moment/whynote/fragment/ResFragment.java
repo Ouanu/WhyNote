@@ -2,8 +2,6 @@ package com.moment.whynote.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,13 +22,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ResFragment extends Fragment {
-    private final static String TAG = "ResFragment.class";
+//    private final static String TAG = "ResFragment.class";
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
 
     public interface ResListener {
-        public void onFragmentSelected(Bundle bundle);
+        void onFragmentSelected(Bundle bundle);
     }
 
     private static ResListener resCallback;

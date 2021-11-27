@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center">
@@ -10,9 +11,12 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:maxLength="24"
-        android:textSize="38sp"
+        android:textSize="20sp"
         android:textColor="@color/black"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        tools:ignore="LabelFor" />
 
     <FrameLayout
         android:id="@+id/fl_uri"
@@ -25,13 +29,15 @@
             android:id="@+id/rv_uris_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:focusableInTouchMode="false"/>
+            android:focusableInTouchMode="false">
+        </androidx.recyclerview.widget.RecyclerView>
     </FrameLayout>
 
     <EditText
         android:id="@+id/et_desc"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="500dp"
         android:layout_below="@id/fl_uri"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
@@ -39,20 +45,24 @@
         android:paddingHorizontal="10dp"
         android:paddingVertical="10dp"
         android:gravity="start"
-        android:background="@drawable/et_bg"/>
+        android:background="@drawable/et_bg"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        tools:ignore="LabelFor" />
 
     <ImageButton
         android:id="@+id/btn_get_uri"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginBottom="80dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
         android:src="@drawable/ic_baseline_web_asset_24"
         android:scaleType="fitCenter"
         android:background="@drawable/ib_selector_bg"
         android:inputType="textNoSuggestions"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/get_text_uri" />
 
 
 

@@ -1,5 +1,7 @@
 package com.moment.whynote.utils;
 
+import android.annotation.SuppressLint;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,7 @@ public class DataUtils {
      */
     public String getNowDateDefault() {
         Date date = new Date();
+        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat mat = new SimpleDateFormat("yyyy-MM-dd-E HH:mm:ss");
         return mat.format(date);
     }
