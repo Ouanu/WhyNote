@@ -70,18 +70,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         btnGetUrl.setOnClickListener(this);
         flUri = view.findViewById(R.id.fl_uri);
         btnEdit = view.findViewById(R.id.btn_edit);
-        btnEdit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-//                    etDesc.setFocusable(true);
-//                    etDesc.setFocusableInTouchMode(true);
-//                    etDesc.requestFocus();
-//                    etDesc.requestFocusFromTouch();
-//                    etDesc.setKeyboardNavigationCluster(false);
-                }
-            }
-        });
     }
 
     /**
@@ -114,6 +102,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 return false;
             }
         });
+
+
 
         etTitle.setOnTouchListener(new View.OnTouchListener() {
             @Override
