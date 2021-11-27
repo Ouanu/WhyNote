@@ -10,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private EditText etTitle;
     private FrameLayout flUri;
     private float lastX = 0.0f;
+    private Switch btnEdit;
 
 
     @Nullable
@@ -66,6 +69,19 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
         flUri = view.findViewById(R.id.fl_uri);
+        btnEdit = view.findViewById(R.id.btn_edit);
+        btnEdit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+//                    etDesc.setFocusable(true);
+//                    etDesc.setFocusableInTouchMode(true);
+//                    etDesc.requestFocus();
+//                    etDesc.requestFocusFromTouch();
+//                    etDesc.setKeyboardNavigationCluster(false);
+                }
+            }
+        });
     }
 
     /**
@@ -85,6 +101,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     flag = false;
                     etDesc.setFocusable(false);
                     Log.d(TAG, "onTouch: " + event.getX());
+
 
                 } else if (event.getAction() == 1 && flag) {
                     etDesc.setFocusable(true);
@@ -181,5 +198,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         adapter = new UriAdapter();
         recyclerView.setAdapter(adapter);
     }
+
+
 
 }
