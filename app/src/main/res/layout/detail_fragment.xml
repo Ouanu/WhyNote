@@ -47,7 +47,6 @@
         android:gravity="start"
         android:background="@drawable/et_bg"
         android:importantForAutofill="no"
-        android:inputType="text"
         tools:ignore="LabelFor" />
 
     <ImageButton

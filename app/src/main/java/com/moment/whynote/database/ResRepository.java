@@ -74,4 +74,26 @@ public class ResRepository {
         dao.insertResData(resData);
     }
 
+    /**
+     * @param id 列表的主键
+     * @return 返回被查询的ResData
+     */
+    public ResData getResDataByUid(int id) {
+        return dao.getResDataByUid(id);
+    }
+
+    /**
+     * @param data 删除ResData
+     */
+    public void deleteResData(ResData data) {
+        dao.deleteResData(data);
+    }
+
+    /**
+     * @param data 更新ResData
+     */
+    public void upResData(ResData data) {
+        dao.updateResData(data);
+    }
+
 }

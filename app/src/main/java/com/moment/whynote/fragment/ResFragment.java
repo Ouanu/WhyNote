@@ -77,11 +77,13 @@ public class ResFragment extends Fragment {
 
         TextView tv_title = itemView.findViewById(R.id.tv_title);
         TextView tv_desc = itemView.findViewById(R.id.tv_desc);
+        ResData data;
 
         public void bind(ResData data) {
             tv_title.setText(data.title);
             tv_desc.setText(data.desc);
             itemView.setOnClickListener(this);
+            this.data = data;
         }
 
         @Override
@@ -89,6 +91,7 @@ public class ResFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putString("title", tv_title.getText().toString());
             bundle.putString("desc", tv_desc.getText().toString());
+            bundle.putInt("primaryKey", data.uid);
             resCallback.onFragmentSelected(bundle);
         }
     }

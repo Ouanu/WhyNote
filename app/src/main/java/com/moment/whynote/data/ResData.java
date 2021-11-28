@@ -24,4 +24,13 @@ public class ResData {
     public String uri;
 
 
+    @Override
+    public String toString() {
+        return "ResData{" +
+                "uid=" + uid +
+                ", title='" + title + '\'' +
+                ", desc='" + desc + '\'' +
+                ", uri='" + uri + '\'' +
+                '}';
+    }
 }

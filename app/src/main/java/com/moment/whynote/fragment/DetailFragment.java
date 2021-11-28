@@ -13,14 +13,20 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.moment.whynote.R;
+import com.moment.whynote.data.ResData;
+import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +41,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private EditText etTitle;
     private Method method;
     private final Class<EditText> cls = EditText.class;
+    private final ResRepository repository = ResRepository.getInstance();
+    private ResData data = null;
 
 
     @Nullable
@@ -52,10 +60,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
+
+
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         if (bundle != null) {
-            etTitle.setText(bundle.getString("title"));
-            etDesc.setText(bundle.getString("desc"));
+            new Thread(() -> {
+                data = repository.getResDataByUid(bundle.getInt("primaryKey"));
+                System.out.println(data.toString());
+                etTitle.setText(data.title);
+                etDesc.setText(data.desc);
+            }).start();
+
         }
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
@@ -170,21 +185,26 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             View view = LayoutInflater.from(getContext()).inflate(R.layout.uri_list_item, parent, false);
             return new UriHolder(view);
         }
+
         @Override
         public void onBindViewHolder(@NonNull @NotNull DetailFragment.UriHolder holder, int position) {
             String uri = uriList.get(position);
             holder.bind(uri);
         }
+
         @Override
         public int getItemCount() {
             return uriList.size();
         }
     }
+
+    /**
+     * 更新UI
+     */
     private void updateUri() {
         UriAdapter adapter = new UriAdapter();
         recyclerView.setAdapter(adapter);
     }
-
 
 
 }
