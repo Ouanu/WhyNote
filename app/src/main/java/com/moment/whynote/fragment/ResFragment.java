@@ -14,8 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.moment.whynote.MainActivity;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.viewmodel.ResViewModel;
