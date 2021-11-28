@@ -180,7 +180,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getContext(), text + " 已复制成功", Toast.LENGTH_SHORT).show();
                 Log.i("xxx", "onClick: " + text);
             }
-
         }
     }
 
