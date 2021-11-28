@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.viewmodel.ResViewModel;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ResFragment extends Fragment {
-//    private final static String TAG = "ResFragment.class";
+    //    private final static String TAG = "ResFragment.class";
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
@@ -104,7 +105,7 @@ public class ResFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putInt("primaryKey", data.uid);
             menuFragment.setArguments(bundle);
-            menuFragment.show(manager,"NULL");
+            menuFragment.show(manager, "NULL");
             return false;
         }
     }

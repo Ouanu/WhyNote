@@ -39,7 +39,7 @@ public class InsertFragment extends DialogFragment implements View.OnClickListen
 
 
     /**
-     *将fragment与activity建立关联
+     * 将fragment与activity建立关联
      */
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
@@ -65,7 +65,7 @@ public class InsertFragment extends DialogFragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.btn_confirm) {
+        if (v.getId() == R.id.btn_confirm) {
             String str = etString.getText().toString();
             dialogListener.sendValue(str);
             this.dismiss();

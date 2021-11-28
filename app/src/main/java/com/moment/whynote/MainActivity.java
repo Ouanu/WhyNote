@@ -23,7 +23,7 @@ import com.moment.whynote.utils.DataUtils;
 import org.jetbrains.annotations.NotNull;
 
 
-public class MainActivity extends AppCompatActivity implements InsertFragment.DialogListener, ResFragment.ResListener{
+public class MainActivity extends AppCompatActivity implements InsertFragment.DialogListener, ResFragment.ResListener {
 
     private ResRepository repository;
     private MainHandler handler;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
      * 初始化控件
      */
     private void initView() {
-        ImageButton insertBtn =  findViewById(R.id.insert_btn);
+        ImageButton insertBtn = findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(v -> new Thread(() -> {
             InsertFragment fragment = new InsertFragment();
             fragment.show(getSupportFragmentManager(), "INSERT_FRAGMENT");

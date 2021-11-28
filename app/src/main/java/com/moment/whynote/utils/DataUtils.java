@@ -33,14 +33,13 @@ public class DataUtils {
     }
 
     /**
-     *
      * @param uriList The uriList which we need to deal with
      * @return A String of uri
      */
-    public String getUriString(List<String> uriList){
+    public String getUriString(List<String> uriList) {
         StringBuilder builder = new StringBuilder();
         for (String s : uriList) {
-            builder.append(s + "\r\n");
+            builder.append(s).append("\r\n");
         }
         return builder.toString();
     }

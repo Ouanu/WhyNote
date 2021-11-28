@@ -151,9 +151,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.btn_get_uri) {
             uriList = utils.getUris(etDesc.getText().toString());
-            new Thread(()->{
-                data.uri = utils.getUriString(uriList);
-            }).start();
+            new Thread(() -> data.uri = utils.getUriString(uriList)).start();
             updateUri();
             recyclerView.requestFocus();
         }
@@ -224,6 +222,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         super.onStop();
         data.title = etTitle.getText().toString();
         data.desc = etDesc.getText().toString();
-        new Thread(()-> repository.upResData(data)).start();
+        new Thread(() -> repository.upResData(data)).start();
     }
 }

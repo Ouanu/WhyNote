@@ -11,15 +11,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -47,7 +50,7 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
         Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         initView(view);
         bundle = getArguments();
-        new Thread(()->data = repository.getResDataByUid(bundle.getInt("primaryKey"))).start();
+        new Thread(() -> data = repository.getResDataByUid(bundle.getInt("primaryKey"))).start();
         return view;
     }
 
@@ -66,8 +69,8 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.btn_delete) {
-            new Thread(()-> {
+        if (v.getId() == R.id.btn_delete) {
+            new Thread(() -> {
                 assert bundle != null;
                 repository.deleteResData(data);
             }).start();
@@ -86,8 +89,8 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
         若检测Uri为空时，自动生成Uri字符串，并提示用户再试一遍
         否则直接复制Uri
          */
-        if(desc == null) {
-            new Thread(()->{
+        if (desc == null) {
+            new Thread(() -> {
                 List<String> uriList = utils.getUris(data.desc);
                 data.uri = utils.getUriString(uriList);
                 repository.upResData(data);
