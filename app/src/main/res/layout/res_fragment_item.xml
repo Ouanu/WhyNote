@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp">
 
@@ -8,40 +9,43 @@
         android:id="@+id/iv_arrow"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/ic_baseline_arrow_right_24"
+        android:layout_centerVertical="true"
         android:scaleType="fitCenter"
-        android:layout_centerVertical="true"/>
+        android:src="@drawable/ic_baseline_arrow_right_24"
+        android:contentDescription="@string/img_arrow" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_toRightOf="@id/iv_arrow"
-        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_toEndOf="@id/iv_arrow"
         android:background="@drawable/et_bg"
-        android:layout_marginBottom="10dp">
+        android:orientation="vertical">
 
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:paddingLeft="10dp"
             android:gravity="center_vertical"
-            android:text="Test"
-            android:textColor="@color/black"
             android:maxLines="1"
-            android:textSize="19sp"/>
+            android:paddingStart="10dp"
+            android:textColor="@color/black"
+            android:textSize="19sp"
+            tools:ignore="RtlSymmetry" />
+
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:paddingLeft="10dp"
-            android:gravity="center_vertical"
             android:layout_below="@id/tv_title"
+            android:gravity="center_vertical"
             android:maxLines="1"
-            android:text="Test"
+            android:paddingStart="10dp"
             android:textColor="@color/black"
-            android:textSize="19sp"/>
+            android:textSize="19sp"
+            tools:ignore="RtlSymmetry" />
     </RelativeLayout>
 
 </RelativeLayout>

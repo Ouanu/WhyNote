@@ -6,13 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.moment.whynote.MainActivity;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.viewmodel.ResViewModel;
@@ -32,6 +35,7 @@ public class ResFragment extends Fragment {
     }
 
     private static ResListener resCallback;
+    private static FragmentManager manager = null;
 
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
@@ -51,6 +55,7 @@ public class ResFragment extends Fragment {
         recyclerView = view.findViewById(R.id.res_fragment_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        manager = this.getParentFragmentManager();
 
         return view;
     }
@@ -70,7 +75,7 @@ public class ResFragment extends Fragment {
     /**
      * Holder
      */
-    static class ResHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ResHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public ResHolder(@NonNull @NotNull View itemView) {
             super(itemView);
         }
@@ -83,16 +88,26 @@ public class ResFragment extends Fragment {
             tv_title.setText(data.title);
             tv_desc.setText(data.desc);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             this.data = data;
         }
 
         @Override
         public void onClick(View v) {
             Bundle bundle = new Bundle();
-            bundle.putString("title", tv_title.getText().toString());
-            bundle.putString("desc", tv_desc.getText().toString());
             bundle.putInt("primaryKey", data.uid);
             resCallback.onFragmentSelected(bundle);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            Toast.makeText(itemView.getContext(), "长按----", Toast.LENGTH_SHORT).show();
+            MenuFragment menuFragment = new MenuFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("primaryKey", data.uid);
+            menuFragment.setArguments(bundle);
+            menuFragment.show(manager,"NULL");
+            return false;
         }
     }
 
