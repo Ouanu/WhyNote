@@ -63,10 +63,15 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
 
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
+        /*
+          初始化title、desc的数据
+         */
         if (bundle != null) {
             new Thread(() -> {
+//                从bundle获取“主键”
                 data = repository.getResDataByUid(bundle.getInt("primaryKey"));
                 System.out.println(data.toString());
+//                初始化数据
                 etTitle.setText(data.title);
                 etDesc.setText(data.desc);
             }).start();
@@ -74,6 +79,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         }
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
+        /*
+        隐藏软键盘
+         */
         try {
             method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
             method.setAccessible(true);
@@ -207,4 +215,14 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     }
 
 
+    /**
+     * 返回保存已修改的数据
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+        data.title = etTitle.getText().toString();
+        data.desc = etDesc.getText().toString();
+        new Thread(()-> repository.upResData(data)).start();
+    }
 }
