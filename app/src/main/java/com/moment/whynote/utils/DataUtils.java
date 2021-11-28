@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class DataUtils {
     /**
      * @param str The String which need us to deal with
-     * @return the list of uris
+     * @return the list of uri
      */
     public List<String> getUris(String str) {
         List<String> uriList = new ArrayList<>();
@@ -30,6 +30,19 @@ public class DataUtils {
 //  We can print its size if necessary.
 //        System.out.println(uriList.size());
         return uriList;
+    }
+
+    /**
+     *
+     * @param uriList The uriList which we need to deal with
+     * @return A String of uri
+     */
+    public String getUriString(List<String> uriList){
+        StringBuilder builder = new StringBuilder();
+        for (String s : uriList) {
+            builder.append(s + "\r\n");
+        }
+        return builder.toString();
     }
 
     /**

@@ -151,6 +151,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.btn_get_uri) {
             uriList = utils.getUris(etDesc.getText().toString());
+            new Thread(()->{
+                data.uri = utils.getUriString(uriList);
+            }).start();
             updateUri();
             recyclerView.requestFocus();
         }
@@ -178,7 +181,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 ClipData mClipData = ClipData.newPlainText("Label", text);
                 manager.setPrimaryClip(mClipData);
                 Toast.makeText(getContext(), text + " 已复制成功", Toast.LENGTH_SHORT).show();
-                Log.i("xxx", "onClick: " + text);
             }
         }
     }
