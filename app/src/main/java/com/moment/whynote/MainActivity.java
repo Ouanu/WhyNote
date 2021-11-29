@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
         if (currentFragment == null) {
             ResFragment fragment = new ResFragment();
             getSupportFragmentManager().beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .setCustomAnimations(R.anim.from_right, R.anim.from_left)
                     .add(R.id.fl_fragment, fragment)
                     .commit();
         }
@@ -82,9 +85,11 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
         DetailFragment detailFragment = new DetailFragment();
         detailFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
+
                 .replace(R.id.fl_fragment, detailFragment)
                 .addToBackStack("detailFragment")
                 .commit();
+
     }
 
     /**

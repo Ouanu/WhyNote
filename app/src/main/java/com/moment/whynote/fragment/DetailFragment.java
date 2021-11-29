@@ -44,6 +44,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private final ResRepository repository = ResRepository.getInstance();
     private ResData data = null;
 
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @org.jetbrains.annotations.Nullable
