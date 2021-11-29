@@ -5,10 +5,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailFragment extends Fragment implements View.OnClickListener {
-    private final static String TAG = "DetailFragment";
+//    private final static String TAG = "DetailFragment";
     private EditText etDesc;
     private boolean flag = false;
     private final DataUtils utils = new DataUtils();
@@ -64,8 +65,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
-
-
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         /*
           初始化title、desc的数据
@@ -128,8 +127,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         //同上
         etTitle.setOnTouchListener((v, event) -> {
-            Log.d(TAG, "onTouch: ----" + event.getAction() + "   " + flag);
-
             if (event.getAction() == 0) {
                 flag = true;
             } else if (event.getAction() == 2) {
@@ -227,5 +224,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         data.title = etTitle.getText().toString();
         data.desc = etDesc.getText().toString();
         new Thread(() -> repository.upResData(data)).start();
+    }
+
+    @Nullable
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        return super.onCreateAnimation(transit, enter, nextAnim);
     }
 }
