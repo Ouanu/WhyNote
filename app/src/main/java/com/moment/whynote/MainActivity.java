@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
         DetailFragment detailFragment = new DetailFragment();
         detailFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
-
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .setCustomAnimations(R.anim.from_right, R.anim.from_left)
                 .replace(R.id.fl_fragment, detailFragment)
                 .addToBackStack("detailFragment")
                 .commit();
