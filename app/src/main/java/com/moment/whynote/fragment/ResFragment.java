@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +30,9 @@ public class ResFragment extends Fragment {
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
+    private LinearLayout llMain;
+    private TextView title;
+    private ImageButton insertBtn;
 
     public interface ResListener {
         void onFragmentSelected(Bundle bundle);
@@ -49,9 +54,12 @@ public class ResFragment extends Fragment {
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
-    public View onCreateView(@NonNull @org.jetbrains.annotations.NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.res_fragment, container, false);
         recyclerView = view.findViewById(R.id.res_fragment_list);
+        llMain = view.findViewById(R.id.ll_main);
+        title = view.findViewById(R.id.title);
+        insertBtn = view.findViewById(R.id.insert_btn);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
