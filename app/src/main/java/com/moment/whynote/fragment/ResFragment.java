@@ -68,7 +68,10 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         title = view.findViewById(R.id.title);
         insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
 
@@ -147,6 +150,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onBindViewHolder(@NonNull @NotNull ResFragment.ResHolder holder, int position) {
             ResData data = dataList.get(position);
+            System.out.println("data==========" + position);
             holder.bind(data);
         }
 
