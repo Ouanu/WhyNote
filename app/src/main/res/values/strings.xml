@@ -2,4 +2,7 @@
     <string name="app_name">WhyNote</string>
     <string name="get_text_uri">获取文本链接</string>
     <string name="img_arrow">箭头</string>
+    <string name="desc">内容</string>
+    <string name="title">标题（可以为空，默认为时间）</string>
+    <string name="confirm">确认</string>
 </resources>

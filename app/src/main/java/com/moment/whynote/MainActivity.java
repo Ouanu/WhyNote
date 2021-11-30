@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
                 .replace(R.id.fl_fragment, detailFragment)
                 .addToBackStack("detailFragment")
                 .commit();
-
     }
 
     /**
@@ -112,12 +111,15 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
     }
 
     @Override
-    public void sendValue(String str) {
-        Log.d(TAG, "sendValue: " + str);
+    public void sendValue(String title, String str) {
         new Thread(() -> {
             ResData data = new ResData();
             repository = ResRepository.getInstance();
-            data.title = utils.getNowDateDefault();
+            if(title == null || title.equals("") || title.isEmpty()) {
+                data.title = utils.getNowDateDefault();
+            } else {
+                data.title = title;
+            }
             data.desc = str;
             repository.insertData(data);
         }).start();

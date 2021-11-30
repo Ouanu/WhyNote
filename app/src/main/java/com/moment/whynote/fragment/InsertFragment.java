@@ -27,12 +27,13 @@ import java.util.Objects;
 public class InsertFragment extends DialogFragment implements View.OnClickListener {
 
     private EditText etString;
+    private EditText etTitle;
 
     /**
      * 回调接口
      */
     public interface DialogListener {
-        void sendValue(String str);
+        void sendValue(String title, String str);
     }
 
     private DialogListener dialogListener;
@@ -57,6 +58,7 @@ public class InsertFragment extends DialogFragment implements View.OnClickListen
         View view = LayoutInflater.from(getContext()).inflate(R.layout.insert_fragment, container, false);
         Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         etString = view.findViewById(R.id.et_string);
+        etTitle = view.findViewById(R.id.et_title);
         Button btnConfirm = view.findViewById(R.id.btn_confirm);
         btnConfirm.setOnClickListener(this);
         return view;
@@ -67,7 +69,8 @@ public class InsertFragment extends DialogFragment implements View.OnClickListen
     public void onClick(View v) {
         if (v.getId() == R.id.btn_confirm) {
             String str = etString.getText().toString();
-            dialogListener.sendValue(str);
+            String title = etTitle.getText().toString();
+            dialogListener.sendValue(title, str);
             this.dismiss();
         }
 

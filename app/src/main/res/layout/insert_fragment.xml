@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/insert_bg"
@@ -7,29 +8,51 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:gravity="center">
+        android:layout_height="300dp"
+        android:gravity="center"
+        tools:ignore="UselessParent">
+
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="20dp"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:background="@drawable/et_bg"
+            android:maxLines="1"
+            android:hint="@string/title"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            tools:ignore="RtlSymmetry"
+            android:autofillHints="null"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/et_string"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginHorizontal="20dp"
-            android:paddingLeft="10dp"
+            android:layout_marginVertical="20dp"
+            android:gravity="center"
+            android:layout_below="@+id/et_title"
+            android:paddingStart="10dp"
             android:background="@drawable/et_bg"
             android:maxLines="1"
-            android:text="Test"
+            android:hint="@string/desc"
             android:textSize="18sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            tools:ignore="RtlSymmetry"
+            android:autofillHints="null"
+            android:inputType="text" />
         <Button
             android:id="@+id/btn_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_below="@id/et_string"
             android:layout_centerInParent="true"
             android:background="@drawable/et_bg"
-            android:text="CONFIRM"
+            android:text="@string/confirm"
             android:textColor="@color/black"/>
     </RelativeLayout>
 </FrameLayout>
