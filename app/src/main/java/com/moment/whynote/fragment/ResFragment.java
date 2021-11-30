@@ -30,7 +30,6 @@ public class ResFragment extends Fragment {
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
-    private LinearLayout llMain;
     private TextView title;
     private ImageButton insertBtn;
 
@@ -57,9 +56,8 @@ public class ResFragment extends Fragment {
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.res_fragment, container, false);
         recyclerView = view.findViewById(R.id.res_fragment_list);
-        llMain = view.findViewById(R.id.ll_main);
         title = view.findViewById(R.id.title);
-        insertBtn = view.findViewById(R.id.insert_btn);
+//        insertBtn = view.findViewById(R.id.insert_btn);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
