@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.viewmodel.ResViewModel;
@@ -25,13 +24,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ResFragment extends Fragment {
+public class ResFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "ResFragment.class";
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
     private TextView title;
-    private ImageButton insertBtn;
+    private FloatingActionButton insertBtn;
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.insert_btn) {
+            new Thread(()->{
+                InsertFragment fragment = new InsertFragment();
+                fragment.show(getParentFragmentManager(), "INSERT_FRAGMENT");
+            }).start();
+        }
+    }
 
     public interface ResListener {
         void onFragmentSelected(Bundle bundle);
@@ -57,7 +66,8 @@ public class ResFragment extends Fragment {
         View view = inflater.inflate(R.layout.res_fragment, container, false);
         recyclerView = view.findViewById(R.id.res_fragment_list);
         title = view.findViewById(R.id.title);
-//        insertBtn = view.findViewById(R.id.insert_btn);
+        insertBtn = view.findViewById(R.id.insert_btn);
+        insertBtn.setOnClickListener(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
