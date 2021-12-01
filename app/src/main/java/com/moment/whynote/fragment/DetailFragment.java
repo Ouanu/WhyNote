@@ -113,6 +113,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 //触摸事件：不弹出键盘
                 flag = false;
                 try {
+                    etDesc.setCursorVisible(false);
                     method.invoke(etDesc, false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -120,6 +121,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             } else if (event.getAction() == 1 && flag) {
                 //点击事件，弹出键盘
                 try {
+                    etDesc.setCursorVisible(true);
                     method.invoke(etDesc, true);
                 } catch (Exception e) {
                     e.printStackTrace();
