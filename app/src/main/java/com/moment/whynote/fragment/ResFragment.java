@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.utils.DataUtils;
 import com.moment.whynote.viewmodel.ResViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,11 +33,12 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private TextView title;
     private FloatingActionButton insertBtn;
     private ResRepository repository;
+    private static final DataUtils utils = new DataUtils();
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.insert_btn) {
-            new Thread(()->{
+            new Thread(() -> {
 //                InsertFragment fragment = new InsertFragment();
 //                fragment.show(getParentFragmentManager(), "INSERT_FRAGMENT");
                 ResData newData = new ResData();
@@ -107,11 +108,18 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 
         TextView tv_title = itemView.findViewById(R.id.tv_title);
         TextView tv_desc = itemView.findViewById(R.id.tv_desc);
+        TextView tv_date = itemView.findViewById(R.id.tv_date);
         ResData data;
 
         public void bind(ResData data) {
-            tv_title.setText(data.title);
-            tv_desc.setText(data.desc);
+            if (data.title.equals("")) {
+                tv_title.setText(data.desc);
+                tv_desc.setVisibility(View.GONE);
+            } else {
+                tv_title.setText(data.title);
+                tv_desc.setText(data.desc);
+            }
+            tv_date.setText(utils.getNowDateDefault(data.updateDate));
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             this.data = data;
@@ -126,7 +134,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public boolean onLongClick(View v) {
-            Toast.makeText(itemView.getContext(), "长按----", Toast.LENGTH_SHORT).show();
             MenuFragment menuFragment = new MenuFragment();
             Bundle bundle = new Bundle();
             bundle.putInt("primaryKey", data.uid);
@@ -165,6 +172,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         public int getItemCount() {
             return dataList.size();
         }
+
     }
 
     /**

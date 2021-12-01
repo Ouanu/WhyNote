@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         if (currentFragment == null) {
             ResFragment fragment = new ResFragment();
             getSupportFragmentManager().beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .setCustomAnimations(R.anim.from_right, R.anim.from_left)
                     .add(R.id.fl_fragment, fragment)
                     .commit();
         }
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         detailFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .setCustomAnimations(R.anim.from_right, R.anim.from_left,R.anim.to_left, R.anim.to_right)
+                .setCustomAnimations(R.anim.show_slide, R.anim.no_slide,R.anim.show_slide, R.anim.no_slide)
                 .replace(R.id.fl_fragment, detailFragment)
                 .addToBackStack("detailFragment")
                 .commit();

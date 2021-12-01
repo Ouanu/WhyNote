@@ -4,27 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#F8F8F8">
+    android:background="@color/background">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:overScrollMode="never">
         <RelativeLayout
             android:id="@+id/ll_main"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="match_parent">
             <TextView
                 android:id="@+id/title_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="70dp"
                 android:text="Why"
                 android:fontFamily="sans-serif-condensed-light"
                 android:textColor="@android:color/black"
-                android:textSize="38sp" />
+                android:textSize="38sp"
+                android:shadowRadius="2"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowColor="@color/black"/>
             <TextView
                 android:id="@+id/title_2"
                 android:layout_width="wrap_content"
@@ -34,18 +38,23 @@
                 android:text="Note"
                 android:fontFamily="sans-serif-light"
                 android:textColor="@android:color/black"
-                android:textSize="50sp" />
-
+                android:textSize="50sp"
+                android:shadowRadius="2"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowColor="@color/black"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/title_2"
-                android:layout_marginTop="100dp">
+                android:layout_marginTop="100dp"
+                android:layout_marginBottom="30dp">
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/res_fragment_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:nestedScrollingEnabled="false">
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never">
                 </androidx.recyclerview.widget.RecyclerView>
             </RelativeLayout>
         </RelativeLayout>
@@ -59,9 +68,11 @@
         android:layout_marginBottom="50dp"
         android:layout_marginEnd="20dp"
         android:src="@drawable/ic_baseline_edit_24"
-        android:backgroundTint="@color/white"
-        app:backgroundTint="@color/white"
-        app:rippleColor="@android:color/holo_blue_light"
+        android:backgroundTint="@android:color/holo_blue_light"
+        app:backgroundTint="@android:color/holo_blue_light"
+        app:rippleColor="@android:color/white"
+        app:elevation="10dp"
+        android:translationZ="5dp"
         android:contentDescription="@string/floating_action_button" />
 
 </RelativeLayout>
