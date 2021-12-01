@@ -3,37 +3,44 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:background="@drawable/et_bg">
 
     <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center">
-
-
         <Button
             android:id="@+id/btn_cp_all"
             android:layout_width="200dp"
             android:layout_height="60dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginVertical="20dp"
             android:background="@drawable/ib_selector_bg"
-            android:text="复制内容" />
+            android:backgroundTint="@color/white"
+            android:text="复制内容"
+            android:textColor="#7CB342"/>
 
         <Button
             android:id="@+id/btn_cp_uri"
             android:layout_width="200dp"
             android:layout_height="60dp"
-            android:background="@drawable/ib_selector_bg"
             android:layout_marginBottom="20dp"
-            android:text="复制链接"/>
+            android:background="@drawable/ib_selector_bg"
+            android:backgroundTint="@color/white"
+            android:text="复制链接"
+            android:textColor="#7CB342"/>
 
         <Button
             android:id="@+id/btn_delete"
             android:layout_width="200dp"
             android:layout_height="60dp"
             android:background="@drawable/ib_selector_bg"
-            android:text="删除(需确定)"/>
+            android:backgroundTint="@color/white"
+            android:layout_marginBottom="20dp"
+            android:translationZ="5dp"
+            android:text="删除"
+            android:textColor="@color/red"/>
 
     </LinearLayout>
 

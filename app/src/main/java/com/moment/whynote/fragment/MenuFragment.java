@@ -1,15 +1,19 @@
 package com.moment.whynote.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,6 +52,7 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.long_click_menu, container, false);
         Objects.requireNonNull(getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getDialog().getWindow().getAttributes().gravity = Gravity.CENTER;
         initView(view);
         bundle = getArguments();
         new Thread(() -> data = repository.getResDataByUid(bundle.getInt("primaryKey"))).start();
@@ -58,9 +63,9 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     初始化控件
      */
     private void initView(View view) {
-        Button btnCpAll = view.findViewById(R.id.btn_cp_all);
-        Button btnCpUri = view.findViewById(R.id.btn_cp_uri);
-        Button btnDelete = view.findViewById(R.id.btn_delete);
+        TextView btnCpAll = view.findViewById(R.id.btn_cp_all);
+        TextView btnCpUri = view.findViewById(R.id.btn_cp_uri);
+        TextView btnDelete = view.findViewById(R.id.btn_delete);
         btnCpAll.setOnClickListener(this);
         btnCpUri.setOnClickListener(this);
         btnDelete.setOnClickListener(this);

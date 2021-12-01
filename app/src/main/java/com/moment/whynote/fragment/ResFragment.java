@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,12 +36,14 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        /*
+        新建笔记
+         */
         if (v.getId() == R.id.insert_btn) {
             new Thread(() -> {
                 ResData newData = new ResData();
                 repository.insertData(newData);
                 Bundle bundle = new Bundle();
-                System.out.println("PrimaryKey ===" + newData.updateDate);
                 bundle.putLong("updateDate", newData.updateDate);
                 resCallback.onFragmentSelected(bundle);
             }).start();
@@ -141,6 +144,8 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             Bundle bundle = new Bundle();
             bundle.putInt("primaryKey", data.uid);
             menuFragment.setArguments(bundle);
+            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
             menuFragment.show(manager, "NULL");
             return false;
         }
