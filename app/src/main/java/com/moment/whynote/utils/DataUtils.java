@@ -47,10 +47,10 @@ public class DataUtils {
     /**
      * @return the date of this system right now
      */
-    public String getNowDateDefault() {
-        Date date = new Date();
+    public String getNowDateDefault(long date) {
+//        Date date = new Date();
         @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat mat = new SimpleDateFormat("yyyy-MM-dd-E HH:mm:ss");
+        SimpleDateFormat mat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
         return mat.format(date);
     }
 

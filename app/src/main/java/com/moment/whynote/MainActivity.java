@@ -116,7 +116,8 @@ public class MainActivity extends AppCompatActivity implements InsertFragment.Di
             ResData data = new ResData();
             repository = ResRepository.getInstance();
             if(title == null || title.equals("") || title.isEmpty()) {
-                data.title = utils.getNowDateDefault();
+                data.updateDate = System.currentTimeMillis();
+                data.title = utils.getNowDateDefault(data.updateDate);
             } else {
                 data.title = title;
             }

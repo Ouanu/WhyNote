@@ -23,14 +23,7 @@ public class ResData {
     @ColumnInfo(name="uri")
     public String uri;
 
+    @ColumnInfo(name="updateDate")
+    public long updateDate;
 
-    @Override
-    public String toString() {
-        return "ResData{" +
-                "uid=" + uid +
-                ", title='" + title + '\'' +
-                ", desc='" + desc + '\'' +
-                ", uri='" + uri + '\'' +
-                '}';
-    }
 }
