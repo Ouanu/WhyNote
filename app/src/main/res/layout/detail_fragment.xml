@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/paper_bg">
+    android:background="#F8F8F8">
 
     <ScrollView
         android:id="@+id/sv_main"
@@ -20,8 +20,10 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="50dp"
                 android:maxLength="24"
+                android:hint="标题"
                 android:textSize="20sp"
                 android:textColor="@color/black"
+                android:backgroundTint="#F8F8F8"
                 android:clickable="true"
                 android:importantForAutofill="no"
                 android:inputType="text"

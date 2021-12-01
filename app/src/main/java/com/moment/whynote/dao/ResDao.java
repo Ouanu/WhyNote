@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface ResDao {
 
-    @Query("SELECT * FROM resdata")
+    @Query("SELECT * FROM resdata order by updateDate desc")
     LiveData<List<ResData>> getAll();
 
     @Query("SELECT * FROM resdata WHERE uid = :id")

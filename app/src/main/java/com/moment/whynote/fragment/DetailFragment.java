@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailFragment extends Fragment implements View.OnClickListener {
-//    private final static String TAG = "DetailFragment";
+    //    private final static String TAG = "DetailFragment";
     private EditText etDesc;
     private boolean flag = false;
     private final DataUtils utils = new DataUtils();
@@ -221,9 +221,18 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
-        data.title = etTitle.getText().toString();
-        data.desc = etDesc.getText().toString();
-        new Thread(() -> repository.upResData(data)).start();
+        //判断标题、内容是否同时为空，若为空则删除该data
+        if (etTitle.getText().toString().equals("") && etDesc.getText().toString().equals("")) {
+            new Thread(() -> repository.deleteResData(data)).start();
+            //否则，检查data的数据与textview中数据是否相同，不相同则更新
+        } else if (!data.title.equals(etTitle.getText().toString()) ||
+                !data.desc.equals(etDesc.getText().toString())) {
+            data.title = etTitle.getText().toString();
+            data.desc = etDesc.getText().toString();
+            data.updateDate = System.currentTimeMillis();
+            new Thread(() -> repository.upResData(data)).start();
+        }
+
     }
 
     @Nullable
