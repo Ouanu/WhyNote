@@ -7,4 +7,7 @@
     <string name="confirm">确认</string>
     <string name="main_title">WhyNote</string>
     <string name="floating_action_button">悬浮操作按钮</string>
+    <string name="detail_title">标题</string>
+    <string name="title_1">Why</string>
+    <string name="title_2">Note</string>
 </resources>

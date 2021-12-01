@@ -10,10 +10,11 @@
         android:id="@+id/sv_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="none"
         android:fillViewport="true">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
             <EditText
                 android:id="@+id/et_title"
                 android:layout_width="match_parent"
@@ -21,7 +22,7 @@
                 android:layout_marginHorizontal="25dp"
                 android:layout_marginTop="50dp"
                 android:maxLength="24"
-                android:hint="标题"
+                android:hint="@string/detail_title"
                 android:textSize="20sp"
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/black"
@@ -45,7 +46,8 @@
                 android:gravity="start"
                 android:background="@color/background"
                 android:importantForAutofill="no"
-                tools:ignore="LabelFor" />
+                tools:ignore="LabelFor"
+                android:inputType="textMultiLine" />
 
 
             <FrameLayout

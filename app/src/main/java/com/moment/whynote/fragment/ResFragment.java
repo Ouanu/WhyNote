@@ -30,8 +30,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private RecyclerView recyclerView;
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
-    private TextView title;
-    private FloatingActionButton insertBtn;
     private ResRepository repository;
     private static final DataUtils utils = new DataUtils();
 
@@ -39,8 +37,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.insert_btn) {
             new Thread(() -> {
-//                InsertFragment fragment = new InsertFragment();
-//                fragment.show(getParentFragmentManager(), "INSERT_FRAGMENT");
                 ResData newData = new ResData();
                 repository.insertData(newData);
                 Bundle bundle = new Bundle();
@@ -50,6 +46,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             }).start();
         }
     }
+
 
     public interface ResListener {
         void onFragmentSelected(Bundle bundle);
@@ -73,17 +70,23 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.res_fragment, container, false);
+        initView(view);
+        return view;
+    }
+
+    /**
+     * 初始化控件
+     * @param view 获取布局视图
+     */
+    private void initView(View view) {
         recyclerView = view.findViewById(R.id.res_fragment_list);
-        title = view.findViewById(R.id.title);
-        insertBtn = view.findViewById(R.id.insert_btn);
+        FloatingActionButton insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
         repository = ResRepository.getInstance();
-
-        return view;
     }
 
 
