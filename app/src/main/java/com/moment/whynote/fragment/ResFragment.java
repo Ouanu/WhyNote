@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
+import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.viewmodel.ResViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +32,20 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private final ResViewModel resViewModel = new ResViewModel();
     private TextView title;
     private FloatingActionButton insertBtn;
+    private ResRepository repository;
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.insert_btn) {
             new Thread(()->{
-                InsertFragment fragment = new InsertFragment();
-                fragment.show(getParentFragmentManager(), "INSERT_FRAGMENT");
+//                InsertFragment fragment = new InsertFragment();
+//                fragment.show(getParentFragmentManager(), "INSERT_FRAGMENT");
+                ResData newData = new ResData();
+                repository.insertData(newData);
+                Bundle bundle = new Bundle();
+                System.out.println("PrimaryKey ===" + newData.updateDate);
+                bundle.putLong("updateDate", newData.updateDate);
+                resCallback.onFragmentSelected(bundle);
             }).start();
         }
     }
@@ -72,6 +80,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
+        repository = ResRepository.getInstance();
 
         return view;
     }

@@ -72,7 +72,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         if (bundle != null) {
             new Thread(() -> {
 //                从bundle获取“主键”
-                data = repository.getResDataByUid(bundle.getInt("primaryKey"));
+                if(null != repository.getResDataByUid(bundle.getInt("primaryKey"))) {
+                    data = repository.getResDataByUid(bundle.getInt("primaryKey"));
+                } else {
+                    data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
+                }
                 System.out.println(data.toString());
 //                初始化数据
                 etTitle.setText(data.title);
@@ -221,6 +225,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
+        System.out.println(data.title);
         //判断标题、内容是否同时为空，若为空则删除该data
         if (etTitle.getText().toString().equals("") && etDesc.getText().toString().equals("")) {
             new Thread(() -> repository.deleteResData(data)).start();

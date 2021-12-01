@@ -15,7 +15,7 @@ public class ResData {
     public int uid;
 
     @ColumnInfo(name="title")
-    public String title;
+    public String title="";
 
     @ColumnInfo(name="desc")
     public String desc="";
@@ -24,6 +24,6 @@ public class ResData {
     public String uri;
 
     @ColumnInfo(name="updateDate")
-    public long updateDate;
+    public long updateDate = System.currentTimeMillis();
 
 }

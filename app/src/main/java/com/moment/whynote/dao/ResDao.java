@@ -20,6 +20,9 @@ public interface ResDao {
     @Query("SELECT * FROM resdata WHERE uid = :id")
     ResData getResDataByUid(int id);
 
+    @Query("SELECT * FROM resdata WHERE updateDate = :updateDate")
+    ResData getResDataByUpdateDate(long updateDate);
+
     @Insert
     void insertResData(ResData data);
 

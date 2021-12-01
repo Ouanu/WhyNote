@@ -83,6 +83,14 @@ public class ResRepository {
     }
 
     /**
+     * @param date 列表的更改时间
+     * @return 返回被查询的ResData
+     */
+    public ResData getResDataByUpdateDate(long date) {
+        return dao.getResDataByUpdateDate(date);
+    }
+
+    /**
      * @param data 删除ResData
      */
     public void deleteResData(ResData data) {
