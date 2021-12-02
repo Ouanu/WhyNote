@@ -33,7 +33,7 @@
                 android:inputType="text"
                 tools:ignore="LabelFor" />
 
-            <EditText
+            <com.moment.whynote.view.OTextEditor
                 android:id="@+id/et_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,26 +45,9 @@
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="10dp"
                 android:gravity="start"
-                android:background="@color/background"
-                android:importantForAutofill="no"
-                tools:ignore="LabelFor"
-                android:inputType="textMultiLine" />
+                android:background="@color/background" />
 
 
-            <FrameLayout
-                android:id="@+id/fl_uri"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/et_desc"
-                android:focusedByDefault="true"
-                android:focusableInTouchMode="false">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_uris_fragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:focusableInTouchMode="false">
-                </androidx.recyclerview.widget.RecyclerView>
-            </FrameLayout>
         </RelativeLayout>
     </com.moment.whynote.view.DampScrollView>
 
