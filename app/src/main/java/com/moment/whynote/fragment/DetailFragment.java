@@ -1,11 +1,14 @@
 package com.moment.whynote.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,24 +18,19 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.moment.whynote.MainActivity;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.FloatViewUtil;
 import com.moment.whynote.view.OTextEditor;
-
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 import java.lang.reflect.Method;
-
 import static android.app.Activity.RESULT_OK;
-
 public class DetailFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "DetailFragment";
 //    private static final String verifyCode = "#w102938m#";
@@ -48,6 +46,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private static int start;
     private static int end;
     private StringBuffer buffer = new StringBuffer();
+    private ContentResolver resolver;
 
 
     @Nullable
@@ -59,6 +58,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+
     private void initView(View view) {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
@@ -67,6 +67,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         ImageButton insertImgBtn = view.findViewById(R.id.insert_img_btn);
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         FloatViewUtil util = new FloatViewUtil(getActivity());
+        resolver = getContext().getContentResolver();
         /*
           初始化title、desc的数据
          */
@@ -81,10 +82,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 System.out.println(data.toString());
 //                初始化数据
                 etTitle.setText(data.title);
-                buffer.append(data.desc);
                 etDesc.getEditText().setText(data.desc);
+                buffer.append(data.desc);
             }).start();
-
         }
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
@@ -173,7 +173,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             Intent intent = new Intent(Intent.ACTION_PICK, null);
             intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
             start = etDesc.getEditText().getSelectionStart();
-            end = etDesc.getEditText().getText().length() - start;
             startActivityForResult(intent, 1000);
             methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
             System.out.println(getActivity().getPackageName());
@@ -189,9 +188,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1000 && resultCode == RESULT_OK) {
             Uri uri = data.getData();
-            buffer.insert(start, "<" + uri + ">");
-            etDesc.getEditText().setText(buffer);
-            etDesc.insertImage(buffer, start, end, getContext().getContentResolver());
+            StringBuffer str = new StringBuffer();
+            str.append(etDesc.getEditText().getText().toString());
+            str.insert(start, "<" + uri + ">");
+            etDesc.getEditText().setText(str);
+            etDesc.insertImage(etDesc.getEditText().getText().toString(), start, end, getContext().getContentResolver());
         }
     }
 

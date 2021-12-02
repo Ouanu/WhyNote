@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public class MainActivity extends AppCompatActivity implements ResFragment.ResListener {
 
 //    private ResRepository repository;
-    private MainHandler handler;
+    public static MainHandler handler;
     private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
 

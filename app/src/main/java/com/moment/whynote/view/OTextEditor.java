@@ -65,7 +65,7 @@ public class OTextEditor extends LinearLayout {
         this.editText = editText;
     }
 
-    public void insertImage(StringBuffer desc, int start, int end, ContentResolver resolver) {
+    public void insertImage(String desc, int start, int end, ContentResolver resolver) {
         SpannableStringBuilder builder = new SpannableStringBuilder(desc);
         String rexgString  = "<([^>]*)>";                                   //正则表达式
         Pattern pattern = Pattern.compile(rexgString);//装载正则表达式
@@ -79,13 +79,16 @@ public class OTextEditor extends LinearLayout {
                 builder.setSpan(
                         new ImageSpan(getContext(), bitmap), matcher.start(), matcher.end(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                System.out.println(desc.length());
+                editText.setText(builder);
+                editText.setSelection(desc.length());
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        editText.setText(builder);
-        editText.setSelection(desc.length());
+//        editText.setText(builder);
+//        editText.setSelection(desc.length());
     }
 
 }
