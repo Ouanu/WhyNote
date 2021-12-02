@@ -9,22 +9,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
-
+import com.moment.whynote.utils.FloatViewUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -43,11 +44,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private final Class<EditText> cls = EditText.class;
     private final ResRepository repository = ResRepository.getInstance();
     private ResData data = null;
+    private LinearLayout llToolbar;
+    private InputMethodManager methodManager;
 
-    @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -64,14 +63,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
+        llToolbar = view.findViewById(R.id.ll_toolbar);
+        ImageButton insertImgBtn = view.findViewById(R.id.insert_img_btn);
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
+        FloatViewUtil util = new FloatViewUtil(getActivity());
         /*
           初始化title、desc的数据
          */
         if (bundle != null) {
             new Thread(() -> {
 //                从bundle获取“主键”
-                if(null != repository.getResDataByUid(bundle.getInt("primaryKey"))) {
+                if (null != repository.getResDataByUid(bundle.getInt("primaryKey"))) {
                     data = repository.getResDataByUid(bundle.getInt("primaryKey"));
                 } else {
                     data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
@@ -85,6 +87,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         }
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
+        insertImgBtn.setOnClickListener(this);
         /*
         隐藏软键盘
          */
@@ -96,8 +99,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        methodManager = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-
+        RelativeLayout rlRes = view.findViewById(R.id.rl_res);
+        util.setFloatView(rlRes, llToolbar);
+        util.setFloatView(rlRes, btnGetUrl);
     }
 
     /**
@@ -113,7 +119,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 flag = false;
                 try {
                     etDesc.setCursorVisible(false);
-                    method.invoke(etDesc, false);
+                    methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
+                    llToolbar.setVisibility(View.GONE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -121,7 +128,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 //点击事件，弹出键盘
                 try {
                     etDesc.setCursorVisible(true);
-                    method.invoke(etDesc, true);
+                    methodManager.showSoftInput(etDesc, InputMethodManager.RESULT_SHOWN);
+                    methodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                            InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    llToolbar.setVisibility(View.VISIBLE);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -150,6 +161,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             }
             return false;
         });
+
     }
 
 

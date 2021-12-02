@@ -5,6 +5,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 数据格式
  */
@@ -25,5 +28,8 @@ public class ResData {
 
     @ColumnInfo(name="updateDate")
     public long updateDate = System.currentTimeMillis();
+
+    @ColumnInfo(name="imgUrl")
+    public String imgUrl = "";
 
 }

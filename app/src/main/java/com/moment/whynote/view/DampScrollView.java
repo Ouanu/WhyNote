@@ -1,5 +1,9 @@
 package com.moment.whynote.view;
 
+/*
+  From https://blog.csdn.net/qq_33601179
+ */
+
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
