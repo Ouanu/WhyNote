@@ -1,14 +1,10 @@
 package com.moment.whynote.fragment;
 
 import android.annotation.SuppressLint;
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,32 +17,30 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.moment.whynote.MainActivity;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.FloatViewUtil;
-import com.moment.whynote.view.OTextEditor;
+import com.moment.whynote.view.OEditText;
 import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
+import java.util.Objects;
+
 import static android.app.Activity.RESULT_OK;
 public class DetailFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "DetailFragment";
 //    private static final String verifyCode = "#w102938m#";
-    private OTextEditor etDesc;
+    private OEditText etDesc;
     private boolean flag = false;
     private EditText etTitle;
     private Method method;
     private final Class<EditText> cls = EditText.class;
     private final ResRepository repository = ResRepository.getInstance();
     private ResData data = null;
-    private LinearLayout llToolbar;
     private InputMethodManager methodManager;
     private static int start;
-    private static int end;
-    private StringBuffer buffer = new StringBuffer();
-    private ContentResolver resolver;
+    private final StringBuffer buffer = new StringBuffer();
+    private LinearLayout llToolbar;
 
 
     @Nullable
@@ -67,7 +61,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         ImageButton insertImgBtn = view.findViewById(R.id.insert_img_btn);
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         FloatViewUtil util = new FloatViewUtil(getActivity());
-        resolver = getContext().getContentResolver();
         /*
           初始化title、desc的数据
          */
@@ -79,13 +72,15 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 } else {
                     data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
                 }
-                System.out.println(data.toString());
 //                初始化数据
-                etTitle.setText(data.title);
-                etDesc.getEditText().setText(data.desc);
-                buffer.append(data.desc);
+
             }).start();
+            etTitle.setText(bundle.getString("title"));
+            etDesc.setText(bundle.getString("desc"));
+            buffer.append(etDesc.getText());
+            etDesc.insertImage(Objects.requireNonNull(etDesc.getText()).toString());
         }
+
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
         insertImgBtn.setOnClickListener(this);
@@ -95,7 +90,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         try {
             method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
             method.setAccessible(true);
-//            method.invoke(etDesc, false);
             method.invoke(etTitle, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,34 +106,34 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      */
     @SuppressLint("ClickableViewAccessibility")
     private void etSetOnTouchListener() {
-//        etDesc.setOnTouchListener((v, event) -> {
-//            if (event.getAction() == 0) {
-//                flag = true;
-//            } else if (event.getAction() == 2) {
-//                //触摸事件：不弹出键盘
-//                flag = false;
-//                try {
-//                    etDesc.setCursorVisible(false);
-//                    methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
-//                    llToolbar.setVisibility(View.GONE);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            } else if (event.getAction() == 1 && flag) {
-//                //点击事件，弹出键盘
-//                try {
-//                    etDesc.setCursorVisible(true);
-//                    methodManager.showSoftInput(etDesc, InputMethodManager.RESULT_SHOWN);
-//                    methodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
-//                            InputMethodManager.HIDE_IMPLICIT_ONLY);
-//                    llToolbar.setVisibility(View.VISIBLE);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            return false;
-//        });
+        etDesc.setOnTouchListener((v, event) -> {
+            if (event.getAction() == 0) {
+                flag = true;
+            } else if (event.getAction() == 2) {
+                //触摸事件：不弹出键盘
+                flag = false;
+                try {
+                    etDesc.setCursorVisible(false);
+                    methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
+                    llToolbar.setVisibility(View.GONE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (event.getAction() == 1 && flag) {
+                //点击事件，弹出键盘
+                try {
+                    etDesc.setCursorVisible(true);
+                    methodManager.showSoftInput(etDesc, InputMethodManager.RESULT_SHOWN);
+                    methodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                            InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    llToolbar.setVisibility(View.VISIBLE);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return false;
+        });
 
 
         //同上
@@ -172,10 +166,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         if (v.getId() == R.id.btn_get_uri) {
             Intent intent = new Intent(Intent.ACTION_PICK, null);
             intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-            start = etDesc.getEditText().getSelectionStart();
+            start = etDesc.getSelectionStart();
             startActivityForResult(intent, 1000);
             methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
-            System.out.println(getActivity().getPackageName());
         } else if (v.getId() == R.id.insert_img_btn) {
 
         }
@@ -187,12 +180,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1000 && resultCode == RESULT_OK) {
+            assert data != null;
             Uri uri = data.getData();
             StringBuffer str = new StringBuffer();
-            str.append(etDesc.getEditText().getText().toString());
-            str.insert(start, "<" + uri + ">");
-            etDesc.getEditText().setText(str);
-            etDesc.insertImage(etDesc.getEditText().getText().toString(), start, end, getContext().getContentResolver());
+            str.append(Objects.requireNonNull(etDesc.getText()).toString());
+            str.insert(start, "<" + etDesc.saveImage(uri) + ">");
+            etDesc.setText(str);
+            etDesc.insertImage(etDesc.getText().toString());
         }
     }
 
@@ -203,18 +197,19 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
-        System.out.println(data.title);
+        System.out.println(data.desc);
         //判断标题、内容是否同时为空，若为空则删除该data
-        if (etTitle.getText().toString().equals("") && etDesc.getEditText().getText().toString().equals("")) {
+        if (etTitle.getText().toString().equals("") && Objects.requireNonNull(etDesc.getText()).toString().equals("")) {
             new Thread(() -> repository.deleteResData(data)).start();
             //否则，检查data的数据与textview中数据是否相同，不相同则更新
         } else if (!data.title.equals(etTitle.getText().toString()) ||
-                !data.desc.equals(etDesc.getEditText().getText().toString())) {
+                !data.desc.equals(Objects.requireNonNull(etDesc.getText()).toString())) {
             data.title = etTitle.getText().toString();
-            data.desc = etDesc.getEditText().getText().toString();
+            System.out.println("DESC+++++++++" + Objects.requireNonNull(etDesc.getText()).toString());
+            System.out.println("DESC+++++++++" + data.desc);
+            data.desc = etDesc.getText().toString();
             data.updateDate = System.currentTimeMillis();
             new Thread(() -> repository.upResData(data)).start();
         }
     }
-
 }

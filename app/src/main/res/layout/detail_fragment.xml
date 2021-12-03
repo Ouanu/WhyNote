@@ -33,7 +33,7 @@
                 android:inputType="text"
                 tools:ignore="LabelFor" />
 
-            <com.moment.whynote.view.OTextEditor
+            <com.moment.whynote.view.OEditText
                 android:id="@+id/et_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

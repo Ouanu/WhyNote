@@ -135,6 +135,8 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         public void onClick(View v) {
             Bundle bundle = new Bundle();
             bundle.putInt("primaryKey", data.uid);
+            bundle.putString("title", data.title);
+            bundle.putString("desc", data.desc);
             resCallback.onFragmentSelected(bundle);
         }
 
