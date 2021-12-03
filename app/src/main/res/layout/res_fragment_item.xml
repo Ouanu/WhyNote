@@ -26,7 +26,7 @@
             android:fontFamily="sans-serif-condensed-medium"
             tools:ignore="RtlSymmetry" />
 
-        <TextView
+        <com.moment.whynote.view.OTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,6 +37,7 @@
             android:textColor="@color/teal_700"
             android:textSize="16sp"
             android:fontFamily="sans-serif-light"
+            android:background="@drawable/et_bg"
             tools:ignore="RtlSymmetry" />
 
         <TextView

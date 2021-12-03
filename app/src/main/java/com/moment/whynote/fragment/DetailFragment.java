@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,7 +40,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private InputMethodManager methodManager;
     private static int start;
     private final StringBuffer buffer = new StringBuffer();
-    private LinearLayout llToolbar;
+    private boolean isAddImage = false;
 
 
     @Nullable
@@ -57,8 +57,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
-        llToolbar = view.findViewById(R.id.ll_toolbar);
-        ImageButton insertImgBtn = view.findViewById(R.id.insert_img_btn);
         ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         FloatViewUtil util = new FloatViewUtil(getActivity());
         /*
@@ -83,7 +81,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         etSetOnTouchListener();
         btnGetUrl.setOnClickListener(this);
-        insertImgBtn.setOnClickListener(this);
         /*
         隐藏软键盘
          */
@@ -91,13 +88,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
             method.setAccessible(true);
             method.invoke(etTitle, false);
+            method.invoke(etDesc, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
         methodManager = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         RelativeLayout rlRes = view.findViewById(R.id.rl_res);
-        util.setFloatView(rlRes, llToolbar);
         util.setFloatView(rlRes, btnGetUrl);
     }
 
@@ -115,7 +112,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 try {
                     etDesc.setCursorVisible(false);
                     methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
-                    llToolbar.setVisibility(View.GONE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -126,8 +122,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     methodManager.showSoftInput(etDesc, InputMethodManager.RESULT_SHOWN);
                     methodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
                             InputMethodManager.HIDE_IMPLICIT_ONLY);
-                    llToolbar.setVisibility(View.VISIBLE);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -169,8 +163,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             start = etDesc.getSelectionStart();
             startActivityForResult(intent, 1000);
             methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
-        } else if (v.getId() == R.id.insert_img_btn) {
-
+            isAddImage = true;
         }
     }
 
@@ -184,9 +177,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             Uri uri = data.getData();
             StringBuffer str = new StringBuffer();
             str.append(Objects.requireNonNull(etDesc.getText()).toString());
-            str.insert(start, "<" + etDesc.saveImage(uri) + ">");
+            str.insert(start, "\n<" + etDesc.saveImage(uri) + ">\n");
             etDesc.setText(str);
             etDesc.insertImage(etDesc.getText().toString());
+            isAddImage = false;
         }
     }
 
@@ -197,17 +191,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
-        System.out.println(data.desc);
         //判断标题、内容是否同时为空，若为空则删除该data
-        if (etTitle.getText().toString().equals("") && Objects.requireNonNull(etDesc.getText()).toString().equals("")) {
+        if (etTitle.getText().toString().equals("") && Objects.requireNonNull(etDesc.getText()).toString().equals("") && !isAddImage) {
             new Thread(() -> repository.deleteResData(data)).start();
+            Log.d("DELETE_RES_DATA", "----------");
             //否则，检查data的数据与textview中数据是否相同，不相同则更新
         } else if (!data.title.equals(etTitle.getText().toString()) ||
                 !data.desc.equals(Objects.requireNonNull(etDesc.getText()).toString())) {
             data.title = etTitle.getText().toString();
             System.out.println("DESC+++++++++" + Objects.requireNonNull(etDesc.getText()).toString());
-            System.out.println("DESC+++++++++" + data.desc);
             data.desc = etDesc.getText().toString();
+            System.out.println("DESC+++++++++" + data.desc);
             data.updateDate = System.currentTimeMillis();
             new Thread(() -> repository.upResData(data)).start();
         }

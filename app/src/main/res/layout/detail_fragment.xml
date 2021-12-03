@@ -46,8 +46,6 @@
                 android:paddingVertical="10dp"
                 android:gravity="start"
                 android:background="@color/background" />
-
-
         </RelativeLayout>
     </com.moment.whynote.view.DampScrollView>
 
@@ -65,24 +63,6 @@
         app:elevation="10dp"
         android:translationZ="5dp"
         android:contentDescription="@string/floating_action_button"/>
-    <LinearLayout
-        android:id="@+id/ll_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:background="@color/background">
-        <ImageButton
-            android:id="@+id/insert_img_btn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:background="@color/background"
-            android:src="@drawable/ic_baseline_image_24"
-            android:scaleType="fitXY"/>
-    </LinearLayout>
 
 
 

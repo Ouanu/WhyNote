@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,17 +13,16 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
+import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
+
 
 public class ResFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "ResFragment.class";
@@ -113,17 +111,20 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         }
 
         TextView tv_title = itemView.findViewById(R.id.tv_title);
-        TextView tv_desc = itemView.findViewById(R.id.tv_desc);
+        OTextView tv_desc = itemView.findViewById(R.id.tv_desc);
         TextView tv_date = itemView.findViewById(R.id.tv_date);
         ResData data;
 
         public void bind(ResData data) {
             if (data.title.equals("")) {
-                tv_title.setText(data.desc);
-                tv_desc.setVisibility(View.GONE);
+                tv_desc.setText(data.desc);
+                tv_desc.insertImage(data.desc);
+//                tv_title.setVisibility(View.GONE);
+                tv_title.setText(utils.getNowDateDefault(data.updateDate));
             } else {
                 tv_title.setText(data.title);
                 tv_desc.setText(data.desc);
+                tv_desc.insertImage(data.desc);
             }
             tv_date.setText(utils.getNowDateDefault(data.updateDate));
             itemView.setOnClickListener(this);
@@ -174,7 +175,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onBindViewHolder(@NonNull @NotNull ResFragment.ResHolder holder, int position) {
             ResData data = dataList.get(position);
-            System.out.println("data==========" + position);
             holder.bind(data);
         }
 
@@ -194,6 +194,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         adapter = new ResAdapter(dataList);
         recyclerView.setAdapter(adapter);
     }
+
 
 
 }

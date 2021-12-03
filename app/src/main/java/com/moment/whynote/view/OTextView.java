@@ -1,4 +1,5 @@
 package com.moment.whynote.view;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,10 +9,15 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.moment.whynote.R;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,17 +27,17 @@ import java.util.regex.Pattern;
 /**
  * A View which can insert images
  */
-public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
+public class OTextView extends androidx.appcompat.widget.AppCompatTextView {
 
-    public OEditText(@NonNull @NotNull Context context) {
+    public OTextView(@NonNull @NotNull Context context) {
         super(context);
     }
 
-    public OEditText(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs) {
+    public OTextView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public OEditText(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
+    public OTextView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -56,33 +62,32 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 System.out.println(desc.length());
                 this.setText(builder);
-                this.setSelection(desc.length());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    /**
-     * save the image
-     * @param uri of image
-     * @return the uri which image we save
-     */
-
-    public Uri saveImage(Uri uri) {
-        String name = String.valueOf(System.currentTimeMillis());
-        File saveFile = new File(getContext().getString(R.string.resource_dcim), name);
-        FileOutputStream saveOutImage;
-        try {
-            saveOutImage = new FileOutputStream(saveFile);
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, saveOutImage);
-            saveOutImage.flush();
-            saveOutImage.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Uri.fromFile(saveFile);
-    }
+//    /**
+//     * save the image
+//     * @param uri of image
+//     * @return the uri which image we save
+//     */
+//
+//    public Uri saveImage(Uri uri) {
+//        String name = String.valueOf(System.currentTimeMillis());
+//        File saveFile = new File(getContext().getString(R.string.resource_dcim), name);
+//        FileOutputStream saveOutImage;
+//        try {
+//            saveOutImage = new FileOutputStream(saveFile);
+//            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, saveOutImage);
+//            saveOutImage.flush();
+//            saveOutImage.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return Uri.fromFile(saveFile);
+//    }
 
 }
