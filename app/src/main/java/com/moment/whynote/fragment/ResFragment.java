@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,8 +33,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
-import java.util.Objects;
-
 
 public class ResFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "ResFragment.class";
@@ -46,7 +46,9 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private RecyclerView.LayoutManager layoutManager = null;
 
     private ImageView ivChangeLayout;
+    Bundle bundle;
 
+    private static boolean showAnimate = true;
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onClick(View v) {
@@ -66,20 +68,23 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 resCallback.onFragmentSelected(bundle);
             }).start();
         } else if (v.getId() == R.id.iv_change_layout) {
+            /*
+            更换布局，修改配置文件
+             */
             SharedPreferences sharedPreferences = requireContext().getSharedPreferences("setting", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             int choice = sharedPreferences.getInt("LayoutManager", 0);
+            showAnimate = true;
             if (choice == 0) {
                 getLayoutManager(1);
+                bundle.putInt("LayoutManager", 1);
                 editor.putInt("LayoutManager", 1);
-
             } else {
                 getLayoutManager(0);
+                bundle.putInt("LayoutManager", 0);
                 editor.putInt("LayoutManager", 0);
-
             }
             editor.apply();
-
         }
     }
 
@@ -116,7 +121,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
      * @param view 获取布局视图
      */
     private void initView(View view) {
-        Bundle bundle = getArguments();
+        bundle = getArguments();
         recyclerView = view.findViewById(R.id.res_fragment_list);
         FloatingActionButton insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
@@ -126,7 +131,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         getLayoutManager(bundle.getInt("LayoutManager"));
         manager = this.getParentFragmentManager();
         repository = ResRepository.getInstance();
-
     }
 
     /**
@@ -143,6 +147,14 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             //瀑布布局
             layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             ivChangeLayout.setImageResource(R.drawable.ic_baseline_grid_on_24);
+        }
+        /*
+        数据更新动画，只有切换布局或更新数据才会播放，点击item退出不会播放
+         */
+        if (showAnimate) {
+            LayoutAnimationController controller = new LayoutAnimationController(AnimationUtils.loadAnimation(getContext(),R.anim.animate));
+            recyclerView.setLayoutAnimation(controller);
+            showAnimate = false;
         }
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
