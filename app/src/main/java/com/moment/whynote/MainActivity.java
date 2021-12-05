@@ -3,6 +3,7 @@ package com.moment.whynote;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     public static MainHandler handler;
 //    private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +38,10 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
         handler = new MainHandler(this.getMainLooper());
         getResRepository();
+        sharedPreferences= getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
         Intent start = new Intent(this, ControlService.class);
         startService(start);
-
     }
 
     /**
@@ -52,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
             dcimDir.mkdirs();
         if(!dcimDir.exists()){
             Toast.makeText(this, "读写权限获取失败，授权后才可正常使用。", Toast.LENGTH_SHORT).show();
+        }
+        if(sharedPreferences.getInt("LayoutManager", -1) == -1) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("LayoutManager", 0);
+            editor.apply();
         }
     }
 
@@ -73,8 +80,11 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
      */
     private void getFragment() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fl_fragment);
+        Bundle bundle = new Bundle();
+        bundle.putInt("LayoutManager", sharedPreferences.getInt("LayoutManager", 0));
         if (currentFragment == null) {
             ResFragment fragment = new ResFragment();
+            fragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fl_fragment, fragment)
                     .commit();

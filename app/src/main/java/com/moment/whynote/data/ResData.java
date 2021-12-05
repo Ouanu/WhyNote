@@ -29,7 +29,4 @@ public class ResData {
     @ColumnInfo(name = "fileName")
     public String fileName = String.valueOf(updateDate);
 
-    @ColumnInfo(name = "imgUrl")
-    public String imgUrl = "";
-
 }

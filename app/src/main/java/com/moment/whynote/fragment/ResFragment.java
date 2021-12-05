@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
@@ -22,7 +24,6 @@ import com.moment.whynote.utils.DataUtils;
 import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private ResRepository repository;
     @SuppressLint("StaticFieldLeak")
     private static final DataUtils utils = new DataUtils();
+    private RecyclerView.LayoutManager layoutManager = null;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -86,17 +88,38 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 
     /**
      * 初始化控件
+     *
      * @param view 获取布局视图
      */
     private void initView(View view) {
+        Bundle bundle = getArguments();
         recyclerView = view.findViewById(R.id.res_fragment_list);
         FloatingActionButton insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        ImageView ivChangeLayout = view.findViewById(R.id.iv_change_layout);
+        ivChangeLayout.setOnClickListener(this);
+        assert bundle != null;
+        getLayoutManager(bundle);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         manager = this.getParentFragmentManager();
         repository = ResRepository.getInstance();
+
+    }
+
+    /**
+     * 获取布局
+     *
+     * @param bundle 布局设置选项
+     */
+    private void getLayoutManager(Bundle bundle) {
+        if (bundle.getInt("LayoutManager") == 0) {
+            //线性布局
+            layoutManager = new LinearLayoutManager(getContext());
+        } else if (bundle.getInt("LayoutManager") == 1) {
+            //瀑布布局
+            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        }
     }
 
 
@@ -203,7 +226,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         adapter = new ResAdapter(dataList);
         recyclerView.setAdapter(adapter);
     }
-
 
 
 }
