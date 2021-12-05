@@ -17,19 +17,22 @@ public class ResData {
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
-    @ColumnInfo(name="title")
-    public String title="";
+    @ColumnInfo(name = "title")
+    public String title = "";
 
-    @ColumnInfo(name="desc")
-    public String desc="";
+    @ColumnInfo(name = "desc")
+    public String desc = "";
 
-    @ColumnInfo(name="uri")
+    @ColumnInfo(name = "uri")
     public String uri;
 
-    @ColumnInfo(name="updateDate")
+    @ColumnInfo(name = "updateDate")
     public long updateDate = System.currentTimeMillis();
 
-    @ColumnInfo(name="imgUrl")
+    @ColumnInfo(name = "fileName")
+    public String fileName = String.valueOf(updateDate);
+
+    @ColumnInfo(name = "imgUrl")
     public String imgUrl = "";
 
 }

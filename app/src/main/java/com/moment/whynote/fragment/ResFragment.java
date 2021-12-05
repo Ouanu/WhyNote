@@ -2,6 +2,7 @@ package com.moment.whynote.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import com.moment.whynote.utils.DataUtils;
 import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 import java.util.List;
 
 
@@ -41,6 +44,9 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             new Thread(() -> {
                 ResData newData = new ResData();
                 repository.insertData(newData);
+                File file = new File("/data/user/0/com.moment.whynote/files/DCIM/" + newData.fileName);
+                if (!file.exists() || !file.isDirectory())
+                    file.mkdirs();
                 Bundle bundle = new Bundle();
                 bundle.putLong("updateDate", newData.updateDate);
                 resCallback.onFragmentSelected(bundle);

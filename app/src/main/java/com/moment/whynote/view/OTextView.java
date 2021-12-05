@@ -10,6 +10,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,27 +68,5 @@ public class OTextView extends androidx.appcompat.widget.AppCompatTextView {
             }
         }
     }
-
-//    /**
-//     * save the image
-//     * @param uri of image
-//     * @return the uri which image we save
-//     */
-//
-//    public Uri saveImage(Uri uri) {
-//        String name = String.valueOf(System.currentTimeMillis());
-//        File saveFile = new File(getContext().getString(R.string.resource_dcim), name);
-//        FileOutputStream saveOutImage;
-//        try {
-//            saveOutImage = new FileOutputStream(saveFile);
-//            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, saveOutImage);
-//            saveOutImage.flush();
-//            saveOutImage.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return Uri.fromFile(saveFile);
-//    }
 
 }

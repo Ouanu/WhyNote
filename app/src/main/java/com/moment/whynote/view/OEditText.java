@@ -8,6 +8,8 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.moment.whynote.R;
@@ -54,7 +56,6 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
                 builder.setSpan(
                         new ImageSpan(getContext(), bitmap), matcher.start(), matcher.end(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                System.out.println(desc.length());
                 this.setText(builder);
                 this.setSelection(desc.length());
             } catch (IOException e) {
@@ -69,9 +70,10 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
      * @return the uri which image we save
      */
 
-    public Uri saveImage(Uri uri) {
+    public Uri saveImage(Uri uri, String path) {
+        Toast.makeText(getContext(), path, Toast.LENGTH_SHORT).show();
         String name = String.valueOf(System.currentTimeMillis());
-        File saveFile = new File(getContext().getString(R.string.resource_dcim), name);
+        File saveFile = new File(path, name);
         FileOutputStream saveOutImage;
         try {
             saveOutImage = new FileOutputStream(saveFile);
@@ -84,5 +86,16 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
         }
         return Uri.fromFile(saveFile);
     }
+
+    /**
+     * delete the Image File of item
+     * @param path the file which we need to deal with
+     */
+    public void deleteImage(String path) {
+        File file = new File(path);
+        if(file.exists())
+            file.delete();
+    }
+
 
 }

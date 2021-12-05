@@ -1,5 +1,4 @@
 package com.moment.whynote.fragment;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +13,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,9 +24,9 @@ import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.FloatViewUtil;
 import com.moment.whynote.view.OEditText;
 import org.jetbrains.annotations.NotNull;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Objects;
-
 import static android.app.Activity.RESULT_OK;
 public class DetailFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "DetailFragment";
@@ -41,6 +42,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private static int start;
     private final StringBuffer buffer = new StringBuffer();
     private boolean isAddImage = false;
+    private final StringBuilder path = new StringBuilder();
+
 
 
     @Nullable
@@ -52,7 +55,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-
+    @SuppressLint("SdCardPath")
     private void initView(View view) {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
@@ -69,14 +72,18 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     data = repository.getResDataByUid(bundle.getInt("primaryKey"));
                 } else {
                     data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
+
                 }
 //                初始化数据
+                path.append("/data/user/0/com.moment.whynote/files/DCIM/").append(data.fileName);
+                System.out.println("++++++++++++++++============" + data.fileName);
 
             }).start();
             etTitle.setText(bundle.getString("title"));
             etDesc.setText(bundle.getString("desc"));
             buffer.append(etDesc.getText());
             etDesc.insertImage(Objects.requireNonNull(etDesc.getText()).toString());
+
         }
 
         etSetOnTouchListener();
@@ -177,12 +184,15 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             Uri uri = data.getData();
             StringBuffer str = new StringBuffer();
             str.append(Objects.requireNonNull(etDesc.getText()).toString());
-            str.insert(start, "\n<" + etDesc.saveImage(uri) + ">\n");
+            str.insert(start, "\n<" + etDesc.saveImage(uri, path.toString()) + ">\n");
             etDesc.setText(str);
             etDesc.insertImage(etDesc.getText().toString());
             isAddImage = false;
         }
     }
+
+
+
 
 
     /**
@@ -191,19 +201,33 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
+
         //判断标题、内容是否同时为空，若为空则删除该data
         if (etTitle.getText().toString().equals("") && Objects.requireNonNull(etDesc.getText()).toString().equals("") && !isAddImage) {
-            new Thread(() -> repository.deleteResData(data)).start();
-            Log.d("DELETE_RES_DATA", "----------");
+            new Thread(() -> {
+                etDesc.deleteImage(path.toString());
+                repository.deleteResData(data);
+            }).start();
             //否则，检查data的数据与textview中数据是否相同，不相同则更新
         } else if (!data.title.equals(etTitle.getText().toString()) ||
                 !data.desc.equals(Objects.requireNonNull(etDesc.getText()).toString())) {
             data.title = etTitle.getText().toString();
-            System.out.println("DESC+++++++++" + Objects.requireNonNull(etDesc.getText()).toString());
-            data.desc = etDesc.getText().toString();
-            System.out.println("DESC+++++++++" + data.desc);
+            data.desc = Objects.requireNonNull(etDesc.getText()).toString();
             data.updateDate = System.currentTimeMillis();
-            new Thread(() -> repository.upResData(data)).start();
+            new Thread(() -> {
+                repository.upResData(data);
+                System.out.println("delete_image");
+                File dir = new File(String.valueOf(path));
+                if (dir.exists()) {
+                    String[] fileList = dir.list();
+                    assert fileList != null;
+                    for (String s : fileList) {
+                        if (!etDesc.getText().toString().contains(s)) {
+                            etDesc.deleteImage(path + "/" + s);
+                        }
+                    }
+                }
+            }).start();
         }
     }
 }
