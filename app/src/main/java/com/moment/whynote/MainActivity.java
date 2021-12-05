@@ -4,11 +4,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,9 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 
 
@@ -30,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
 
     //    private ResRepository repository;
     public static MainHandler handler;
-    private final static String TAG = "MainActivity";
+//    private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
 
     @Override
@@ -38,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
-        int n = this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         handler = new MainHandler(this.getMainLooper());
         getResRepository();
         PrepareWork();
@@ -50,8 +45,9 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     /**
      * 创建资源文件夹
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void PrepareWork() {
-        File dcimDir = new File("/data/user/0/com.moment.whynote/files/DCIM");
+        @SuppressLint("SdCardPath") File dcimDir = new File("/data/user/0/com.moment.whynote/files/DCIM");
         if (!dcimDir.exists() || !dcimDir.isDirectory())
             dcimDir.mkdirs();
         if(!dcimDir.exists()){

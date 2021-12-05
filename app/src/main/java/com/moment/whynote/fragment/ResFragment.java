@@ -1,8 +1,8 @@
 package com.moment.whynote.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +33,10 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private ResAdapter adapter;
     private final ResViewModel resViewModel = new ResViewModel();
     private ResRepository repository;
+    @SuppressLint("StaticFieldLeak")
     private static final DataUtils utils = new DataUtils();
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onClick(View v) {
         /*
@@ -44,6 +46,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             new Thread(() -> {
                 ResData newData = new ResData();
                 repository.insertData(newData);
+                @SuppressLint("SdCardPath")
                 File file = new File("/data/user/0/com.moment.whynote/files/DCIM/" + newData.fileName);
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();

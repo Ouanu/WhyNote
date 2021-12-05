@@ -62,18 +62,6 @@ public class DataUtils {
         return builder.toString();
     }
 
-    public Queue<Uri> getUri(String desc) {
-        Queue<Uri> uriList = null;
-        SpannableStringBuilder builder = new SpannableStringBuilder(desc);
-        String rex  = "<([^>]*)>";    //regular expression
-        Pattern pattern = Pattern.compile(rex);// mount regular expression
-        Matcher matcher = pattern.matcher(desc);
-        while (matcher.find()) {
-            uriList.offer(Uri.parse(matcher.group()));
-        }
-        return uriList;
-    }
-
 
     /**
      * @return the date of this system right now

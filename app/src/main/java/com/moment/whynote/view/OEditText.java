@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.moment.whynote.R;
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -91,6 +90,7 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
      * delete the Image File of item
      * @param path the file which we need to deal with
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void deleteImage(String path) {
         File file = new File(path);
         if(file.exists())

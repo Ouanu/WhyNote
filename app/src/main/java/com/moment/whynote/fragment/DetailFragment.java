@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,17 +30,25 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "DetailFragment";
 //    private static final String verifyCode = "#w102938m#";
     private OEditText etDesc;
-    private boolean flag = false;
     private EditText etTitle;
+    private boolean flag = false;
+
+    /*
+    获取处理软键盘的方法
+     */
     private Method method;
     private final Class<EditText> cls = EditText.class;
+    private InputMethodManager methodManager;
+    /*
+    获得数据库的单例
+     */
     private final ResRepository repository = ResRepository.getInstance();
     private ResData data = null;
-    private InputMethodManager methodManager;
     private static int start;
     private final StringBuffer buffer = new StringBuffer();
-    private boolean isAddImage = false;
     private final StringBuilder path = new StringBuilder();
+    private boolean isAddImage = false;
+
 
 
 
@@ -201,7 +207,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
-
         //判断标题、内容是否同时为空，若为空则删除该data
         if (etTitle.getText().toString().equals("") && Objects.requireNonNull(etDesc.getText()).toString().equals("") && !isAddImage) {
             new Thread(() -> {
