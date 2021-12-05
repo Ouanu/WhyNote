@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     public static MainHandler handler;
 //    private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
+    // 设置文件
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         if(!dcimDir.exists()){
             Toast.makeText(this, "读写权限获取失败，授权后才可正常使用。", Toast.LENGTH_SHORT).show();
         }
+        // 若是没有获取布局key， 则创建并设置值为0（默认线性布局）
         if(sharedPreferences.getInt("LayoutManager", -1) == -1) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt("LayoutManager", 0);

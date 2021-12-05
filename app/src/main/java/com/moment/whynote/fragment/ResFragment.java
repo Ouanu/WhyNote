@@ -2,12 +2,14 @@ package com.moment.whynote.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
@@ -23,9 +26,12 @@ import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
 import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 
 public class ResFragment extends Fragment implements View.OnClickListener {
@@ -36,7 +42,10 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     private ResRepository repository;
     @SuppressLint("StaticFieldLeak")
     private static final DataUtils utils = new DataUtils();
+    //布局管理
     private RecyclerView.LayoutManager layoutManager = null;
+
+    private ImageView ivChangeLayout;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -56,6 +65,21 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 bundle.putLong("updateDate", newData.updateDate);
                 resCallback.onFragmentSelected(bundle);
             }).start();
+        } else if (v.getId() == R.id.iv_change_layout) {
+            SharedPreferences sharedPreferences = requireContext().getSharedPreferences("setting", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            int choice = sharedPreferences.getInt("LayoutManager", 0);
+            if (choice == 0) {
+                getLayoutManager(1);
+                editor.putInt("LayoutManager", 1);
+
+            } else {
+                getLayoutManager(0);
+                editor.putInt("LayoutManager", 0);
+
+            }
+            editor.apply();
+
         }
     }
 
@@ -96,12 +120,10 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         recyclerView = view.findViewById(R.id.res_fragment_list);
         FloatingActionButton insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
-        ImageView ivChangeLayout = view.findViewById(R.id.iv_change_layout);
+        ivChangeLayout = view.findViewById(R.id.iv_change_layout);
         ivChangeLayout.setOnClickListener(this);
         assert bundle != null;
-        getLayoutManager(bundle);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        getLayoutManager(bundle.getInt("LayoutManager"));
         manager = this.getParentFragmentManager();
         repository = ResRepository.getInstance();
 
@@ -110,16 +132,20 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     /**
      * 获取布局
      *
-     * @param bundle 布局设置选项
+     * @param choice 布局设置选项
      */
-    private void getLayoutManager(Bundle bundle) {
-        if (bundle.getInt("LayoutManager") == 0) {
+    private void getLayoutManager(int choice) {
+        if (choice == 0) {
             //线性布局
             layoutManager = new LinearLayoutManager(getContext());
-        } else if (bundle.getInt("LayoutManager") == 1) {
+            ivChangeLayout.setImageResource(R.drawable.ic_baseline_list_24);
+        } else if (choice == 1) {
             //瀑布布局
             layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+            ivChangeLayout.setImageResource(R.drawable.ic_baseline_grid_on_24);
         }
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
 
