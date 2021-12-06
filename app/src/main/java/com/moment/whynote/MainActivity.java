@@ -19,6 +19,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
+import com.moment.whynote.service.ControlService;
+
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 

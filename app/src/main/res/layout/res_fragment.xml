@@ -47,8 +47,8 @@
 
             <ImageView
                 android:id="@+id/iv_change_layout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/ic_baseline_list_24"
                 android:scaleType="fitXY"
                 android:layout_alignParentEnd="true"

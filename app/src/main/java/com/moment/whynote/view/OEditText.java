@@ -2,6 +2,7 @@ package com.moment.whynote.view;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.Spannable;
@@ -52,8 +53,17 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
             uri = matcher.group().replaceAll("[<>]","");
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(uri));
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                // 计算缩放比例.
+                float k = ((float) 640) / width;
+                // 取得想要缩放的matrix参数.
+                Matrix matrix = new Matrix();
+                matrix.postScale(k, k);
+                // 得到新的图片.
+                Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
                 builder.setSpan(
-                        new ImageSpan(getContext(), bitmap), matcher.start(), matcher.end(),
+                        new ImageSpan(getContext(), newBitmap), matcher.start(), matcher.end(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 this.setText(builder);
                 this.setSelection(desc.length());
@@ -96,6 +106,8 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
         if(file.exists())
             file.delete();
     }
+
+
 
 
 }
