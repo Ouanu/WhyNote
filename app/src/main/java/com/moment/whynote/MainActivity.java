@@ -2,7 +2,6 @@ package com.moment.whynote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,7 +18,6 @@ import androidx.fragment.app.FragmentTransaction;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
-import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.File;

@@ -49,7 +49,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     Bundle bundle;
 
     private static boolean showAnimate = true;
-    private TextView title2;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -138,7 +137,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         getLayoutManager(bundle.getInt("LayoutManager"));
         manager = this.getParentFragmentManager();
         repository = ResRepository.getInstance();
-        title2 = view.findViewById(R.id.title_2);
+        TextView title2 = view.findViewById(R.id.title_2);
         title2.setOnClickListener(this);
     }
 

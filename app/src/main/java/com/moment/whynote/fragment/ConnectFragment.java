@@ -2,23 +2,18 @@ package com.moment.whynote.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.renderscript.Sampler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-
 import com.moment.whynote.R;
 import com.moment.whynote.service.ControlService;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 
 /**
  * 长按自定义弹窗
@@ -30,7 +25,6 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
 
     private EditText etIpAddress;
     private EditText etPort;
-    private Button btnConnect;
 
     /**
      * @return 自定义布局
@@ -48,7 +42,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     private void initView(View view) {
         etIpAddress = view.findViewById(R.id.et_ip_address);
         etPort = view.findViewById(R.id.et_port);
-        btnConnect = view.findViewById(R.id.btn_connect);
+        Button btnConnect = view.findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(this);
     }
 

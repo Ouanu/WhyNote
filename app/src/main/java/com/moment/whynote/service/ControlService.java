@@ -26,6 +26,7 @@ public class ControlService extends Service {
         return null;
     }
 
+    @SuppressWarnings("InstantiationOfUtilityClass")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: The service on.");
@@ -33,7 +34,7 @@ public class ControlService extends Service {
         new Thread(() -> {
             try {
                 WNClient client = new WNClient(bundle.getString("ip"), bundle.getInt("port"));
-//                Toast.makeText(getApplicationContext(), "in thread", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onStartCommand: " + client.hashCode());
             } catch (IOException e) {
                 e.printStackTrace();
             }

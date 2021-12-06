@@ -1,10 +1,7 @@
 package com.moment.whynote.service;
 
 import android.util.Log;
-import android.widget.Toast;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -29,6 +26,7 @@ public class WNClient {
         socket.close();
     }
 
+    @SuppressWarnings("All")
     public static WNClient getInstance(String ipAddress, int port) throws IOException {
         if(mClient == null){
             synchronized (WNClient.class) {
