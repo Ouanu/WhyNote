@@ -43,8 +43,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         getResRepository();
         sharedPreferences= getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
-        Intent start = new Intent(this, ControlService.class);
-        startService(start);
+
     }
 
     /**

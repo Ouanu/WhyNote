@@ -49,6 +49,8 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     Bundle bundle;
 
     private static boolean showAnimate = true;
+    private TextView title2;
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onClick(View v) {
@@ -85,6 +87,11 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 editor.putInt("LayoutManager", 0);
             }
             editor.apply();
+        } else if (v.getId() == R.id.title_2) {
+            ConnectFragment connectFragment = new ConnectFragment();
+            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
+            connectFragment.show(manager, "NULL");
         }
     }
 
@@ -131,6 +138,8 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         getLayoutManager(bundle.getInt("LayoutManager"));
         manager = this.getParentFragmentManager();
         repository = ResRepository.getInstance();
+        title2 = view.findViewById(R.id.title_2);
+        title2.setOnClickListener(this);
     }
 
     /**
@@ -152,7 +161,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         数据更新动画，只有切换布局或更新数据才会播放，点击item退出不会播放
          */
         if (showAnimate) {
-            LayoutAnimationController controller = new LayoutAnimationController(AnimationUtils.loadAnimation(getContext(),R.anim.animate));
+            LayoutAnimationController controller = new LayoutAnimationController(AnimationUtils.loadAnimation(getContext(), R.anim.animate));
             recyclerView.setLayoutAnimation(controller);
             showAnimate = false;
         }
