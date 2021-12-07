@@ -18,7 +18,6 @@ public class WNClient {
         PrintWriter pw = new PrintWriter(os);
         //获取客户端ip地址
         InetAddress address = InetAddress.getLocalHost();
-        Log.d("Client...", String.valueOf(socket.isConnected()));
         String ip = address.getHostAddress();
         pw.write("客户端：" + ip + "接入服务器");
         pw.flush();

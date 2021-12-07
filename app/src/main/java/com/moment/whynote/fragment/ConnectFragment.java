@@ -1,7 +1,9 @@
 package com.moment.whynote.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import com.moment.whynote.service.ControlService;
 import org.jetbrains.annotations.NotNull;
 
 
+
 /**
  * 长按自定义弹窗
  * 实现功能：
@@ -23,8 +26,28 @@ import org.jetbrains.annotations.NotNull;
 public class ConnectFragment extends DialogFragment implements View.OnClickListener {
 
 
+    private static final String TAG = "ConnectFragment";
     private EditText etIpAddress;
     private EditText etPort;
+
+    public interface ConnectListener {
+        void onConnectSelected(Bundle bundle);
+    }
+
+    private static ConnectListener connectCallback;
+
+
+    @Override
+    public void onAttach(@NonNull @NotNull Context context) {
+        super.onAttach(context);
+        connectCallback = (ConnectListener) context;
+    }
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     /**
      * @return 自定义布局
@@ -35,6 +58,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.connect_fragment, container, false);
         initView(view);
+
         return view;
     }
 
@@ -44,16 +68,28 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
         etPort = view.findViewById(R.id.et_port);
         Button btnConnect = view.findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(this);
+        Button btnDisconnect = view.findViewById(R.id.btn_disconnect);
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_connect) {
-            Intent start = new Intent(getContext(), ControlService.class);
-            start.putExtra("ip",etIpAddress.getText().toString());
-            start.putExtra("port", Integer.valueOf(etPort.getText().toString()));
-            requireContext().startService(start);
+            Bundle bundle = new Bundle();
+            bundle.putString("ip", etIpAddress.getText().toString());
+            bundle.putInt("port", Integer.valueOf(etPort.getText().toString()));
+            connectCallback.onConnectSelected(bundle);
             dismiss();
+        } else if (v.getId() == R.id.btn_disconnect) {
+//            if (mService != null) {
+//                mService = null;
+//                requireContext().unbindService(conn);
+//            }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy: delete========");
+        super.onDestroy();
     }
 }

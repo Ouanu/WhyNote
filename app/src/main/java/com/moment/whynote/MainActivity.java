@@ -2,11 +2,17 @@ package com.moment.whynote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,21 +22,25 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.fragment.ConnectFragment;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
+import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 
-public class MainActivity extends AppCompatActivity implements ResFragment.ResListener {
+public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener {
 
     //    private ResRepository repository;
     public static MainHandler handler;
-//    private final static String TAG = "MainActivity";
+    private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
     // 设置文件
     private SharedPreferences sharedPreferences;
+    private ServiceConnection conn;
+    private ControlService mService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +51,18 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         getResRepository();
         sharedPreferences= getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
+        conn = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.d(TAG, "绑定成功调用：onServiceConnected");
+                ControlService.ControlBinder binder = (ControlService.ControlBinder) service;
+                mService = binder.getService();
+            }
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mService = null;
+            }
+        };
 
     }
 
@@ -102,6 +124,14 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
                 .replace(R.id.fl_fragment, detailFragment)
                 .addToBackStack("detailFragment")
                 .commit();
+    }
+
+    @Override
+    public void onConnectSelected(Bundle bundle) {
+        Intent start = new Intent(this, ControlService.class);
+        start.putExtra("ip", bundle.getString("ip"));
+        start.putExtra("port", bundle.getInt("port"));
+        this.bindService(start, conn, Service.BIND_AUTO_CREATE);
     }
 
     /**
