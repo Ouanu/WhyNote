@@ -69,21 +69,22 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
         Button btnConnect = view.findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(this);
         Button btnDisconnect = view.findViewById(R.id.btn_disconnect);
+        btnDisconnect.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Bundle bundle = new Bundle();
         if (v.getId() == R.id.btn_connect) {
-            Bundle bundle = new Bundle();
+            bundle.putString("command", "start");
             bundle.putString("ip", etIpAddress.getText().toString());
             bundle.putInt("port", Integer.valueOf(etPort.getText().toString()));
             connectCallback.onConnectSelected(bundle);
             dismiss();
         } else if (v.getId() == R.id.btn_disconnect) {
-//            if (mService != null) {
-//                mService = null;
-//                requireContext().unbindService(conn);
-//            }
+            bundle.putString("command", "finish");
+            connectCallback.onConnectSelected(bundle);
+            dismiss();
         }
     }
 

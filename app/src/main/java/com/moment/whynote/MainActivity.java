@@ -128,10 +128,19 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
 
     @Override
     public void onConnectSelected(Bundle bundle) {
-        Intent start = new Intent(this, ControlService.class);
-        start.putExtra("ip", bundle.getString("ip"));
-        start.putExtra("port", bundle.getInt("port"));
-        this.bindService(start, conn, Service.BIND_AUTO_CREATE);
+        if (bundle.getString("command").equals("start")) {
+            Intent start = new Intent(this, ControlService.class);
+            start.putExtra("ip", bundle.getString("ip"));
+            start.putExtra("port", bundle.getInt("port"));
+            this.bindService(start, conn, Service.BIND_AUTO_CREATE);
+        } else if (bundle.getString("command").equals("finish")) {
+            if (mService != null) {
+                mService = null;
+                Log.d(TAG, "onConnectSelected: ========");
+                this.unbindService(conn);
+            }
+        }
+
     }
 
     /**
