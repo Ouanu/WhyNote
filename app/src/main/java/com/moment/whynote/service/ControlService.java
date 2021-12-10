@@ -12,8 +12,7 @@ import java.io.IOException;
 public class ControlService extends Service {
     private final static String TAG = "ControlService";
     private Bundle bundle;
-    private boolean quit = false;
-    private ControlBinder binder = new ControlBinder();
+    private final ControlBinder binder = new ControlBinder();
 
     /**
      * 提供数据交换接口
@@ -57,7 +56,7 @@ public class ControlService extends Service {
 
     @Override
     public void onDestroy() {
-        this.quit = true;
+        boolean quit = true;
         Log.d(TAG, "onDestroy: service disconnect");
         super.onDestroy();
     }

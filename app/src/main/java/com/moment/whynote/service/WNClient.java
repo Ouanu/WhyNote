@@ -1,14 +1,13 @@
 package com.moment.whynote.service;
 
-import android.icu.util.Output;
-import android.util.Log;
+
+import android.annotation.SuppressLint;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -18,7 +17,7 @@ import java.net.Socket;
 
 public class WNClient {
     private static WNClient mClient = null;
-    private static final String TAG = "WNClient.class";
+//    private static final String TAG = "WNClient.class";
 //    private Socket socket;
 //    private OutputStream os;
 
@@ -36,7 +35,6 @@ public class WNClient {
         socket.close();
     }
 
-    @SuppressWarnings("All")
     public static WNClient getInstance(String ipAddress, int port) throws IOException {
         if (mClient == null) {
             synchronized (WNClient.class) {
@@ -52,6 +50,7 @@ public class WNClient {
         try {
 //            for (File file : fileList) {
             // 获得需要传输的文件
+            @SuppressLint("SdCardPath")
             FileInputStream fs = new FileInputStream(new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db"));
             // 创建本地流
             BufferedInputStream bi = new BufferedInputStream(fs);
@@ -89,8 +88,10 @@ public class WNClient {
     }
 
     public File[] getFileList() {
+        @SuppressLint("SdCardPath")
         File file = new File("/data/data/com.moment.whynote/databases");        //获取其file对象
         File[] fs = file.listFiles();    //遍历path下的文件和目录，放在File数组中
+        assert fs != null;
         for (File f : fs) {                    //遍历File[]数组
             if (!f.isDirectory())        //若非目录(即文件)，则打印
                 System.out.println(f);

@@ -1,7 +1,6 @@
 package com.moment.whynote.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import com.moment.whynote.R;
-import com.moment.whynote.service.ControlService;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -78,7 +76,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
         if (v.getId() == R.id.btn_connect) {
             bundle.putString("command", "start");
             bundle.putString("ip", etIpAddress.getText().toString());
-            bundle.putInt("port", Integer.valueOf(etPort.getText().toString()));
+            bundle.putInt("port", Integer.parseInt(etPort.getText().toString()));
             connectCallback.onConnectSelected(bundle);
             dismiss();
         } else if (v.getId() == R.id.btn_disconnect) {
