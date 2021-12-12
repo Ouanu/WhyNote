@@ -24,7 +24,7 @@ public class WNClient {
     public WNClient(Socket socket) {
         this.socket = socket;
         PrepareWork();
-//        PushDatabase();
+        PushDatabase();
 //        if (prepareFlag && result == 0xb2018) PushDatabase();
 //        else Log.d(TAG, "Push file false......");
 //        PushImageCache();
@@ -51,12 +51,12 @@ public class WNClient {
             /*
               通知 Server 准备好接受文件
              */
-            outputStream.writeInt(0x1b859);
+//            outputStream.writeInt(0x1b859);
 //            outputStream.writeUTF("Hello");
-            outputStream.flush();
-            result = inputStream.readInt();
-            Log.d(TAG, "PrepareWork: " + result);
-            prepareFlag = true;
+//            outputStream.flush();
+//            result = inputStream.readInt();
+//            Log.d(TAG, "PrepareWork: " + result);
+//            prepareFlag = true;
         } catch (IOException e) {
             e.printStackTrace();
             prepareFlag = false;
@@ -69,8 +69,10 @@ public class WNClient {
      */
     private void PushDatabase() {
         @SuppressLint("SdCardPath")
-        File file = new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db");
-        try {
+        File file = new File("/data/data/com.moment.whynote/databases");
+        File[] files = file.listFiles();
+        for (File file1 : files) {
+            try {
             /*
             1.发送接收数据库指令
             2.发送文件名
@@ -78,22 +80,23 @@ public class WNClient {
             4.等待Server发回接收完成
              */
 //            outputStream.writeInt(0x29cdd);
-            Log.d(TAG, "PushDatabase: ========" + file.getName());
-            outputStream.writeUTF(file.getName());
-//            outputStream.writeUTF("hello");
-            outputStream.flush();
-            FileInputStream fis = new FileInputStream(file);
-            outputStream.write(fis.available());
-            byte[] buffer = new byte[1024];
-            while (fis.available() > 0) {
-                int len = fis.read(buffer);
-                outputStream.write(buffer, 0, len);
+                Log.d(TAG, "PushDatabase: ========" + file1.getName());
+                outputStream.writeUTF(file1.getName());
                 outputStream.flush();
+                FileInputStream fis = new FileInputStream(file1);
+                outputStream.writeInt(fis.available());
+                byte[] buffer = new byte[1024];
+                while (fis.available() > 0) {
+                    int len = fis.read(buffer);
+                    outputStream.write(buffer, 0, len);
+                    outputStream.flush();
+                }
+//                Log.d(TAG, "PushDatabase: " + inputStream.readUTF());
+            } catch (IOException e) {
+                Log.d(TAG, "in pushdatabase Push file false......");
             }
-            Log.d(TAG, "PushDatabase: " + inputStream.readUTF());
-        } catch (IOException e) {
-            Log.d(TAG, "in pushdatabase Push file false......");
         }
+
     }
 
     /**
