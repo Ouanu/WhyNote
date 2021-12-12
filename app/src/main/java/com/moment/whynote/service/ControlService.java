@@ -8,11 +8,13 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public class ControlService extends Service {
     private final static String TAG = "ControlService";
     private Bundle bundle;
     private final ControlBinder binder = new ControlBinder();
+    private Socket socket;
 
     /**
      * 提供数据交换接口
@@ -38,7 +40,8 @@ public class ControlService extends Service {
         new Thread(() -> {
             try {
                 Log.d(TAG, "onCreate: ++++++++++++");
-                WNClient client = new WNClient(bundle.getString("ip"), bundle.getInt("port"));
+                socket = new Socket("172.18.3.5", 7290);
+                WNClient client = WNClient.getInstance(socket);
                 Log.d(TAG, "onStartCommand: " + client.hashCode());
             } catch (IOException e) {
                 e.printStackTrace();

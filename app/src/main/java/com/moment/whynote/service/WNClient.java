@@ -1,102 +1,138 @@
 package com.moment.whynote.service;
 
-
 import android.annotation.SuppressLint;
+import android.util.Log;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class WNClient {
-    private static WNClient mClient = null;
-//    private static final String TAG = "WNClient.class";
-//    private Socket socket;
-//    private OutputStream os;
+    private static final String TAG = "WNClient.class";
+    private final Socket socket;
+    private DataOutputStream outputStream = null;
+    private DataInputStream inputStream = null;
+    private static WNClient instance = null;
+    private static int result;
+    private static boolean prepareFlag = false;
 
-    public WNClient(String ipAddress, int port) throws IOException {
-        Socket socket = new Socket(ipAddress, port);
-        OutputStream os = socket.getOutputStream();
-        PrintWriter pw = new PrintWriter(os);
-//        获取客户端ip地址
-        InetAddress address = InetAddress.getLocalHost();
-        String ip = address.getHostAddress();
-        pw.write("客户端：" + ip + "接入服务器");
-        pw.flush();
-//        socket.shutdownOutput();
-        sendFile(socket);
-        socket.close();
+    public WNClient(Socket socket) {
+        this.socket = socket;
+        PrepareWork();
+//        PushDatabase();
+//        if (prepareFlag && result == 0xb2018) PushDatabase();
+//        else Log.d(TAG, "Push file false......");
+//        PushImageCache();
+
     }
 
-    public static WNClient getInstance(String ipAddress, int port) throws IOException {
-        if (mClient == null) {
+    public static WNClient getInstance(Socket socket) {
+        if (instance == null) {
             synchronized (WNClient.class) {
-                mClient = new WNClient(ipAddress, port);
+                instance = new WNClient(socket);
+                return instance;
             }
         }
-        return mClient;
+        return instance;
     }
 
-    public void sendFile(Socket socket) {
-//        File[] fileList = getFileList();
-//        Log.d(TAG, "sendFile: " + fileList.length);
+    /**
+     * 准备工作
+     */
+    public void PrepareWork() {
         try {
-//            for (File file : fileList) {
-            // 获得需要传输的文件
-            @SuppressLint("SdCardPath")
-            FileInputStream fs = new FileInputStream(new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db"));
-            // 创建本地流
-            BufferedInputStream bi = new BufferedInputStream(fs);
-
-            // 网络上的流
-            OutputStream os = socket.getOutputStream();
-            BufferedOutputStream bos = new BufferedOutputStream(os);
-
-            // 传到服务区
-            int data;
-            while ((data = bi.read()) != -1) {
-                bos.write(data);
-            }
-            bos.flush();
-
-            // 给服务器一个结束标志，表示数据已经传输完毕
-            socket.shutdownOutput();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String str;
-            while ((str = br.readLine()) != null) {
-                System.out.println(str);
-            }
-            // 释放资源
-            os.close();
-            bi.close();
-
-            socket.close();
-//            }
-
+            outputStream = new DataOutputStream(socket.getOutputStream());
+            inputStream = new DataInputStream(socket.getInputStream());
+            /*
+              通知 Server 准备好接受文件
+             */
+            outputStream.writeInt(0x1b859);
+//            outputStream.writeUTF("Hello");
+            outputStream.flush();
+            result = inputStream.readInt();
+            Log.d(TAG, "PrepareWork: " + result);
+            prepareFlag = true;
         } catch (IOException e) {
             e.printStackTrace();
+            prepareFlag = false;
+            Log.d(TAG, "PrepareWork: false");
         }
-
     }
 
-    public File[] getFileList() {
+    /**
+     * 传送数据库
+     */
+    private void PushDatabase() {
         @SuppressLint("SdCardPath")
-        File file = new File("/data/data/com.moment.whynote/databases");        //获取其file对象
-        File[] fs = file.listFiles();    //遍历path下的文件和目录，放在File数组中
-        assert fs != null;
-        for (File f : fs) {                    //遍历File[]数组
-            if (!f.isDirectory())        //若非目录(即文件)，则打印
-                System.out.println(f);
+        File file = new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db");
+        try {
+            /*
+            1.发送接收数据库指令
+            2.发送文件名
+            3.发送文件大小
+            4.等待Server发回接收完成
+             */
+//            outputStream.writeInt(0x29cdd);
+            Log.d(TAG, "PushDatabase: ========" + file.getName());
+            outputStream.writeUTF(file.getName());
+//            outputStream.writeUTF("hello");
+            outputStream.flush();
+            FileInputStream fis = new FileInputStream(file);
+            outputStream.write(fis.available());
+            byte[] buffer = new byte[1024];
+            while (fis.available() > 0) {
+                int len = fis.read(buffer);
+                outputStream.write(buffer, 0, len);
+                outputStream.flush();
+            }
+            Log.d(TAG, "PushDatabase: " + inputStream.readUTF());
+        } catch (IOException e) {
+            Log.d(TAG, "in pushdatabase Push file false......");
         }
-        return fs;
     }
+
+    /**
+     * 发送图片文件
+     */
+    private void PushImageCache() {
+        File dir = new File("/data/data/com.moment.whynote/files/DCIM");
+        File[] fileList = dir.listFiles();
+        Queue<File> fileQueue = new LinkedList<>();
+        for (File file : fileList) {
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                fileQueue.offer(file);
+                for (File file1 : files) {
+                    if(file1.isFile())
+                        fileQueue.offer(file1);
+                }
+            }
+        }
+        while(fileQueue.size() > 0) {
+            try {
+                outputStream.writeInt(0x29cdd);
+                outputStream.writeUTF(fileQueue.peek().getName());
+                FileInputStream fis = new FileInputStream(fileQueue.peek());
+                outputStream.write(fis.available());
+                byte[] buffer = new byte[1024];
+                while (fis.available() > 0) {
+                    int len = fis.read(buffer);
+                    outputStream.write(buffer, 0, len);
+                    outputStream.flush();
+                }
+                Log.d(TAG, "PushDatabase: " + inputStream.readUTF());
+            } catch (IOException e) {
+//                e.printStackTrace();
+                Log.d(TAG, "PushImageCache: sending images false");
+            }
+        }
+    }
+
+
 
 }
