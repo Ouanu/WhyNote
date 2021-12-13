@@ -40,7 +40,7 @@ public class ControlService extends Service {
         new Thread(() -> {
             try {
                 Log.d(TAG, "onCreate: ++++++++++++");
-                socket = new Socket("172.18.3.5", 7290);
+                socket = new Socket(bundle.getString("ip"), 7290);
                 WNClient client = WNClient.getInstance(socket);
                 Log.d(TAG, "onStartCommand: " + client.hashCode());
             } catch (IOException e) {
