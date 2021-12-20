@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         if(sharedPreferences.getInt("LayoutManager", -1) == -1) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt("LayoutManager", 0);
+            editor.putString("updateTime", String.valueOf(System.currentTimeMillis()));
             editor.apply();
         }
     }
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
             Intent start = new Intent(this, ControlService.class);
             start.putExtra("ip", bundle.getString("ip"));
             start.putExtra("port", bundle.getInt("port"));
+            start.putExtra("updateTime", bundle.getString("updateTime"));
             this.bindService(start, conn, Service.BIND_AUTO_CREATE);
         } else if (bundle.getString("command").equals("finish")) {
             if (mService != null) {

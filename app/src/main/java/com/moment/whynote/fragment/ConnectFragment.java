@@ -80,7 +80,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
             connectCallback.onConnectSelected(bundle);
             dismiss();
         } else if (v.getId() == R.id.btn_disconnect) {
-            bundle.putString("command", "finish");
+            bundle.putString("command", "quit");
             connectCallback.onConnectSelected(bundle);
             dismiss();
         }

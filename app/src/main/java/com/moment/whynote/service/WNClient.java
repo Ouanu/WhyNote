@@ -19,55 +19,10 @@ public class WNClient {
     private DataOutputStream outputStream = null;
     private DataInputStream inputStream = null;
     private static WNClient instance = null;
-    private static int preHashCode = 1;
+
 
     public WNClient(Socket socket) {
         this.socket = socket;
-        if(PrepareWork())
-            checkedCode();
-    }
-
-    /**
-     * 检查指令
-     */
-    private void checkedCode() {
-        new Thread(()->{
-            Log.d(TAG, "checkedCode: In it");
-            while(true) {
-                try {
-                    //noinspection BusyWait
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (socket.isConnected()) {
-                    Log.d(TAG, "checkedCode: in connect");
-                    @SuppressLint("SdCardPath")
-                    File file = new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db-wal");
-                    Log.d(TAG, "checkedCode: " + preHashCode);
-                    if (preHashCode == 0) {
-                        preHashCode = file.hashCode();
-                        try {
-                            outputStream.writeInt(0x1b859);
-                            PushDatabase();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        if(preHashCode != file.hashCode()) {
-                            preHashCode = file.hashCode();
-                            try {
-                                outputStream.writeInt(0x1b859);
-                                PushDatabase();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-
-        }).start();
     }
 
     public static WNClient getInstance(Socket socket) {
@@ -104,7 +59,7 @@ public class WNClient {
     /**
      * 传送数据库
      */
-    private void PushDatabase() {
+    public void PushDatabase() {
         @SuppressLint("SdCardPath")
         File file = new File("/data/data/com.moment.whynote/databases");
         File[] files = file.listFiles();
@@ -131,7 +86,7 @@ public class WNClient {
                 }
                 Log.d(TAG, "PushDatabase: " + inputStream.readUTF());
             } catch (IOException e) {
-                Log.d(TAG, "in pushdatabase Push file false......");
+                Log.d(TAG, "in pushDatabase Push file false......");
             }
         }
 
@@ -140,7 +95,7 @@ public class WNClient {
     /**
      * 发送图片文件
      */
-    private void PushImageCache() {
+    public void PushImageCache() {
         @SuppressLint("SdCardPath")
         File dir = new File("/data/data/com.moment.whynote/files/DCIM");
         File[] fileList = dir.listFiles();
@@ -175,7 +130,6 @@ public class WNClient {
             }
         }
     }
-
 
 
 }
