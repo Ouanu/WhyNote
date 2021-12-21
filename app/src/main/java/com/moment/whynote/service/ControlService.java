@@ -50,13 +50,10 @@ public class ControlService extends Service {
     public IBinder onBind(Intent intent) {
         bundle = intent.getExtras();
         Log.d(TAG, "onBind: ===============");
-        if (!bundle.isEmpty()) {
-            if (bundle.getString("command").equals("start")) {
-                updateTime = bundle.getString("updateTime");
-                handler.sendEmptyMessage(CONNECT_SERVER);
-            } else if (bundle.getString("command").equals("quit")) {
-                handler.sendEmptyMessage(DISCONNECT_SERVER);
-            }
+        if (null != bundle && !bundle.isEmpty()) {
+            Log.d(TAG, "onBind: " + bundle.getString("command"));
+            updateTime = bundle.getString("updateTime");
+            handler.sendEmptyMessage(CONNECT_SERVER);
         } else {
             handler.sendEmptyMessage(BUNDLE_IS_NULL);
         }
@@ -124,6 +121,7 @@ public class ControlService extends Service {
      * 断开连接
      */
     private void disconnectServer() {
+        Log.d(TAG, "disconnectServer");
         if (null != socket && socket.isConnected()) {
             try {
                 client = null;
@@ -138,6 +136,7 @@ public class ControlService extends Service {
      * 创建线程连接
      */
     private void connectServer() {
+        Log.d(TAG, "connectServer");
         new Thread(() -> {
             try {
                 socket = new Socket(bundle.getString("ip"), 7290);

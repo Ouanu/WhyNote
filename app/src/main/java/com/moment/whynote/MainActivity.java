@@ -2,6 +2,7 @@ package com.moment.whynote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -30,6 +31,8 @@ import com.moment.whynote.service.ControlService;
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener {
 
@@ -46,10 +49,10 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
         handler = new MainHandler(this.getMainLooper());
         getResRepository();
-        sharedPreferences= getSharedPreferences("setting", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
         conn = new ServiceConnection() {
             @Override
@@ -142,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
                 this.unbindService(conn);
             }
         }
+
 
     }
 
