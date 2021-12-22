@@ -29,14 +29,14 @@ public class FloatViewUtil {
      * @param root 根布局
      * @param floatView 控件
      */
-    public void setFloatView(View root, View floatView) {
+    public void setFloatView(View root, View floatView, int diff) {
         ViewTreeObserver.OnGlobalLayoutListener layoutListener = () -> {
             Rect rect = new Rect();
             context.getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
             int nowHeight = height - (rect.bottom - rect.top);
             boolean isShowing = nowHeight > height / 3;
             if (isShowing) {
-                floatView.animate().translationY(-nowHeight).setDuration(0).start();
+                floatView.animate().translationY(-nowHeight + diff).setDuration(0).start();
             } else {
                 floatView.animate().translationY(0).start();
             }

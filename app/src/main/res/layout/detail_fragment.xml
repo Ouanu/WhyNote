@@ -1,69 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_res"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F8F8F8">
 
     <com.moment.whynote.view.DampScrollView
         android:id="@+id/sv_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:scrollbars="none">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <EditText
                 android:id="@+id/et_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="25dp"
                 android:layout_marginTop="50dp"
-                android:maxLength="24"
-                android:hint="@string/detail_title"
-                android:textSize="20sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/black"
                 android:backgroundTint="@color/background"
                 android:clickable="true"
+                android:fontFamily="sans-serif-medium"
+                android:hint="@string/detail_title"
                 android:importantForAutofill="no"
                 android:inputType="text"
+                android:maxLength="24"
+                android:textColor="@color/black"
+                android:textSize="20sp"
                 tools:ignore="LabelFor" />
 
             <com.moment.whynote.view.OEditText
                 android:id="@+id/et_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="500dp"
                 android:layout_below="@id/et_title"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="20dp"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp"
+                android:background="@color/background"
                 android:gravity="start"
-                android:background="@color/background" />
+                android:minHeight="500dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="10dp" />
         </RelativeLayout>
     </com.moment.whynote.view.DampScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_get_uri"
-        android:layout_width="wrap_content"
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/btn_get_uri"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_alignParentEnd="true"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_marginBottom="50dp"-->
+    <!--        android:layout_marginEnd="20dp"-->
+    <!--        android:src="@drawable/ic_baseline_link_24"-->
+    <!--        app:backgroundTint="@color/white"-->
+    <!--        app:rippleColor="@android:color/holo_blue_light"-->
+    <!--        app:elevation="10dp"-->
+    <!--        android:translationZ="5dp"-->
+    <!--        android:contentDescription="@string/floating_action_button"/>-->
+    <include layout="@layout/tool_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="50dp"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/ic_baseline_link_24"
-        app:backgroundTint="@color/white"
-        app:rippleColor="@android:color/holo_blue_light"
-        app:elevation="10dp"
-        android:translationZ="5dp"
-        android:contentDescription="@string/floating_action_button"/>
-
-
+        android:layout_marginBottom="50dp"/>
 
 </RelativeLayout>

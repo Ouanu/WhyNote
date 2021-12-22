@@ -54,8 +54,6 @@ public class ControlService extends Service {
             Log.d(TAG, "onBind: " + bundle.getString("command"));
             updateTime = bundle.getString("updateTime");
             handler.sendEmptyMessage(CONNECT_SERVER);
-        } else {
-            handler.sendEmptyMessage(BUNDLE_IS_NULL);
         }
         return binder;
     }

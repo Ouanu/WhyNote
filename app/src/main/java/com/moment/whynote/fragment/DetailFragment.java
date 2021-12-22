@@ -1,31 +1,39 @@
 package com.moment.whynote.fragment;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.FloatViewUtil;
 import com.moment.whynote.view.OEditText;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Objects;
+
 import static android.app.Activity.RESULT_OK;
+
 public class DetailFragment extends Fragment implements View.OnClickListener {
     //    private final static String TAG = "DetailFragment";
 //    private static final String verifyCode = "#w102938m#";
@@ -48,8 +56,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private final StringBuffer buffer = new StringBuffer();
     private final StringBuilder path = new StringBuilder();
     private boolean isAddImage = false;
-
-
+    private LinearLayout toolbar;
 
 
     @Nullable
@@ -66,7 +73,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
-        ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
+        toolbar =view.findViewById(R.id.toolbar);
+//        ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
         FloatViewUtil util = new FloatViewUtil(getActivity());
         /*
           初始化title、desc的数据
@@ -93,7 +101,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         }
 
         etSetOnTouchListener();
-        btnGetUrl.setOnClickListener(this);
+//        btnGetUrl.setOnClickListener(this);
+        toolbar.setVisibility(View.GONE);
         /*
         隐藏软键盘
          */
@@ -108,7 +117,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         methodManager = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         RelativeLayout rlRes = view.findViewById(R.id.rl_res);
-        util.setFloatView(rlRes, btnGetUrl);
+//        util.setFloatView(rlRes, btnGetUrl);
+        util.setFloatView(rlRes, toolbar, 100);
+        util.setFloatView(rlRes, etDesc, 500);
     }
 
     /**
@@ -125,6 +136,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 try {
                     etDesc.setCursorVisible(false);
                     methodManager.hideSoftInputFromWindow(etDesc.getWindowToken(), 0);
+                    toolbar.setVisibility(View.GONE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -135,6 +147,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     methodManager.showSoftInput(etDesc, InputMethodManager.RESULT_SHOWN);
                     methodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
                             InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    toolbar.setVisibility(View.VISIBLE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -167,6 +180,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     }
 
 
+
     @SuppressWarnings("deprecation")
     @Override
     public void onClick(View v) {
@@ -196,9 +210,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             isAddImage = false;
         }
     }
-
-
-
 
 
     /**

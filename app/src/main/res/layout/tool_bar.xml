@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/background"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/bold"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="B"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        android:textSize="22sp"/>
+
+    <TextView
+        android:id="@+id/size"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="S"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        android:textSize="22sp"/>
+
+    <TextView
+        android:id="@+id/italic"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="I"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        android:textSize="22sp"/>
+
+    <TextView
+        android:id="@+id/add_title"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="T"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        android:textSize="22sp"/>
+
+    <TextView
+        android:id="@+id/add_list"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="·—"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        android:textSize="22sp"/>
+
+    <ImageView
+        android:id="@+id/btn_get_uri"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/ic_baseline_image_24"
+        android:scaleType="center"/>
+
+</LinearLayout>

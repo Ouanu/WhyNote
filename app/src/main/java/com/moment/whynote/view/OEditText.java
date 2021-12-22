@@ -3,12 +3,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.inputmethodservice.KeyboardView;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -106,8 +108,5 @@ public class OEditText extends androidx.appcompat.widget.AppCompatEditText {
         if(file.exists())
             file.delete();
     }
-
-
-
 
 }
