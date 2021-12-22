@@ -3,6 +3,7 @@ package com.moment.whynote.utils;
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -17,7 +18,8 @@ public class FloatViewUtil {
     public FloatViewUtil(Activity context) {
         this.context = context;
         if (height == 0) {
-            Display display = context.getWindowManager().getDefaultDisplay();
+//            Display display = context.getWindowManager().getDefaultDisplay();
+            Display display = context.getDisplay();
             Point point = new Point();
             display.getSize(point);
             height = point.y;
@@ -34,7 +36,9 @@ public class FloatViewUtil {
             Rect rect = new Rect();
             context.getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
             int nowHeight = height - (rect.bottom - rect.top);
+            Log.d("KEYBOARD_________", "setFloatView: " + nowHeight);
             boolean isShowing = nowHeight > height / 3;
+            Log.d("KEYBOARD_________", "setFloatView: " + height);
             if (isShowing) {
                 floatView.animate().translationY(-nowHeight + diff).setDuration(0).start();
             } else {

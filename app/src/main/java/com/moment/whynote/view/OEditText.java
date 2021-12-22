@@ -11,6 +11,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;

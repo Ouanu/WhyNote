@@ -6,13 +6,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -73,8 +72,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         Bundle bundle = getArguments();
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
-        toolbar =view.findViewById(R.id.toolbar);
-//        ImageButton btnGetUrl = view.findViewById(R.id.btn_get_uri);
+        toolbar = view.findViewById(R.id.toolbar);
+        ImageView btnGetUri = view.findViewById(R.id.btn_get_uri);
         FloatViewUtil util = new FloatViewUtil(getActivity());
         /*
           初始化title、desc的数据
@@ -101,7 +100,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         }
 
         etSetOnTouchListener();
-//        btnGetUrl.setOnClickListener(this);
+        btnGetUri.setOnClickListener(this);
         toolbar.setVisibility(View.GONE);
         /*
         隐藏软键盘
@@ -117,9 +116,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         methodManager = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         RelativeLayout rlRes = view.findViewById(R.id.rl_res);
-//        util.setFloatView(rlRes, btnGetUrl);
-        util.setFloatView(rlRes, toolbar, 100);
-        util.setFloatView(rlRes, etDesc, 500);
+        util.setFloatView(etDesc, toolbar, 0);
+//        util.setFloatView(rlRes, etDesc, 500);
     }
 
     /**
@@ -178,7 +176,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         });
 
     }
-
 
 
     @SuppressWarnings("deprecation")
