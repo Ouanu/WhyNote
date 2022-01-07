@@ -1,73 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/toolbar"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="@color/background"
+    android:weightSum="6"
     android:gravity="center">
 
     <TextView
         android:id="@+id/bold"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="B"
+        android:text="@string/b"
         android:textColor="@color/black"
         android:fontFamily="sans-serif-black"
+        android:clickable="true"
         android:textSize="22sp"/>
 
-    <TextView
-        android:id="@+id/size"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="S"
-        android:textColor="@color/black"
-        android:fontFamily="sans-serif-black"
-        android:textSize="22sp"/>
 
     <TextView
         android:id="@+id/italic"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="I"
+        android:text="@string/i"
         android:textColor="@color/black"
         android:fontFamily="sans-serif-black"
         android:textSize="22sp"/>
 
     <TextView
         android:id="@+id/add_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="T"
-        android:textColor="@color/black"
-        android:fontFamily="sans-serif-black"
-        android:textSize="22sp"/>
-
-    <TextView
-        android:id="@+id/add_list"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="·—"
+        android:text="@string/t"
         android:textColor="@color/black"
         android:fontFamily="sans-serif-black"
         android:textSize="22sp"/>
 
     <ImageView
+        android:id="@+id/add_list"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/ic_baseline_format_list_bulleted_24"
+        android:scaleType="center"
+        android:contentDescription="@string/add_list" />
+
+    <ImageView
         android:id="@+id/btn_get_uri"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:src="@drawable/ic_baseline_image_24"
-        android:scaleType="center"/>
+        android:scaleType="center"
+        android:contentDescription="@string/add_picture" />
 
 </LinearLayout>

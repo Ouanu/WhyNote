@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_res"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F8F8">
 
-    <com.moment.whynote.view.DampScrollView
-        android:id="@+id/sv_main"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:scrollbars="none">
+        android:layout_marginBottom="60dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <EditText
                 android:id="@+id/et_title"
                 android:layout_width="match_parent"
@@ -31,32 +28,42 @@
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:maxLength="24"
+                android:text="TEST"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 tools:ignore="LabelFor" />
 
-            <com.moment.whynote.view.OEditText
+            <com.moment.oetlib.view.OEditTextView
                 android:id="@+id/et_desc"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@id/et_title"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
-                android:background="@color/background"
-                android:gravity="start"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp" />
+                android:layout_marginHorizontal="25dp"
+                android:scrollbars="none" />
         </RelativeLayout>
-    </com.moment.whynote.view.DampScrollView>
-    <include
-        layout="@layout/tool_bar"
-        android:fitsSystemWindows="true"
-        android:layout_width="match_parent"
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_model"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="50dp" />
+        android:src="@drawable/ic_baseline_edit_24"
+        android:backgroundTint="@android:color/holo_blue_light"
+        app:backgroundTint="@android:color/holo_blue_light"
+        app:rippleColor="@android:color/white"
+        app:elevation="10dp"
+        android:translationZ="5dp"
+        android:contentDescription="@string/floating_action_button" />
+
+    <com.moment.oetlib.view.OToolBarView
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>
