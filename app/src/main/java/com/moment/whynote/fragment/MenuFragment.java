@@ -20,11 +20,8 @@ import androidx.fragment.app.DialogFragment;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
-import com.moment.whynote.utils.DataUtils;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,7 +35,6 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     private final ResRepository repository = ResRepository.getInstance();
     private Bundle bundle;
     private ResData data;
-    private final DataUtils utils = new DataUtils();
 
     /**
      * @return 自定义布局
@@ -61,10 +57,8 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
      */
     private void initView(View view) {
         TextView btnCpAll = view.findViewById(R.id.btn_cp_all);
-        TextView btnCpUri = view.findViewById(R.id.btn_cp_uri);
         TextView btnDelete = view.findViewById(R.id.btn_delete);
         btnCpAll.setOnClickListener(this);
-        btnCpUri.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
     }
 
@@ -78,8 +72,6 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
             }).start();
         } else if (v.getId() == R.id.btn_cp_all) {
             copyMethod(data.desc);
-        } else if (v.getId() == R.id.btn_cp_uri) {
-            copyMethod(data.uri);
         }
         dismiss();
     }
@@ -87,24 +79,11 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
 
     //复制选项
     private void copyMethod(String desc) {
-        /*
-        若检测Uri为空时，自动生成Uri字符串，并提示用户再试一遍
-        否则直接复制Uri
-         */
-        if (desc == null) {
-            new Thread(() -> {
-                List<String> uriList = utils.getUris(data.desc);
-                data.uri = utils.getUriString(uriList);
-                repository.upResData(data);
-            }).start();
-            Toast.makeText(getContext(), "再试一下！！", Toast.LENGTH_SHORT).show();
-        } else {
-            if (null != requireContext().getSystemService(Context.CLIPBOARD_SERVICE)) {
-                ClipboardManager manager = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData mClipData = ClipData.newPlainText("Label", desc);
-                manager.setPrimaryClip(mClipData);
-                Toast.makeText(getContext(), desc + " 已复制成功", Toast.LENGTH_SHORT).show();
-            }
+        if (null != requireContext().getSystemService(Context.CLIPBOARD_SERVICE)) {
+            ClipboardManager manager = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData mClipData = ClipData.newPlainText("Label", desc);
+            manager.setPrimaryClip(mClipData);
+            Toast.makeText(getContext(), desc + " 已复制成功", Toast.LENGTH_SHORT).show();
         }
 
     }
