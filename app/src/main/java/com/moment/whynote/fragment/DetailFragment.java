@@ -1,6 +1,7 @@
 package com.moment.whynote.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,33 +43,33 @@ public class DetailFragment extends Fragment {
 
     private void initView(View view) {
         Bundle bundle = getArguments();
+        Log.d("BUNDLE>>>>>>>>>>>>>", "initView: " + bundle);
         repository = ResRepository.getInstance();
         rlRes = view.findViewById(R.id.rl_res);
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
         toolbar = view.findViewById(R.id.toolbar);
         etDesc.getEditText().setBackgroundColor(0);
-        etTitle.setText(bundle.getString("title"));
-        etDesc.getEditText().setText(bundle.getString("desc"));
         new Thread(()->{
-            data = repository.getResDataByUid(bundle.getInt("primaryKey"));
-            preTitle = etTitle.getText().toString();
-            preDesc = etDesc.getEditText().getText().toString();
+            if (bundle.getInt("primaryKey") == 0) {
+                data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
+            } else {
+                data = repository.getResDataByUid(bundle.getInt("primaryKey"));
+            }
+            etTitle.setText(data.title);
+            etDesc.getEditText().setText(data.desc);
+            Log.d("INIT_VIEW", "initView: " + bundle.getInt("primaryKey") );
         }).start();
-
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if(etTitle.getText().toString().contains("")
-                &&etDesc.getEditText().getText().toString().contains("")){
-            new Thread(()->repository.deleteResData(data));
-        } else {
-            data.title = etTitle.getText().toString();
-            data.desc = etDesc.getEditText().getText().toString();
-            new Thread(()->repository.upResData(data));
-        }
+        new Thread(()->{
+            data.title = String.valueOf(etTitle.getText());
+            data.desc = String.valueOf(etDesc.getEditText().getText());
+            repository.upResData(data);
+        }).start();
     }
 }

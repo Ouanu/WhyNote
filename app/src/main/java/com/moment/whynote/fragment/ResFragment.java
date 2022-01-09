@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +66,9 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();
                 Bundle bundle = new Bundle();
+                bundle.putInt("primaryKey", newData.uid);
                 bundle.putLong("updateDate", newData.updateDate);
+
                 resCallback.onFragmentSelected(bundle);
             }).start();
         } else if (v.getId() == R.id.iv_change_layout) {
@@ -136,9 +139,9 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         assert bundle != null;
         getLayoutManager(bundle.getInt("LayoutManager"));
         manager = this.getParentFragmentManager();
-        repository = ResRepository.getInstance();
         TextView title2 = view.findViewById(R.id.title_2);
         title2.setOnClickListener(this);
+        repository = ResRepository.getInstance();
     }
 
     /**
@@ -216,7 +219,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             bundle.putInt("primaryKey", data.uid);
             bundle.putString("title", data.title);
             bundle.putString("desc", data.desc);
-
             resCallback.onFragmentSelected(bundle);
         }
 

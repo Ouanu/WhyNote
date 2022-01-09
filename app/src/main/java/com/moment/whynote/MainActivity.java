@@ -30,6 +30,7 @@ import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     private SharedPreferences sharedPreferences;
     private ServiceConnection conn;
     private ControlService mService;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,19 +76,22 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void PrepareWork() {
-        @SuppressLint("SdCardPath") File dcimDir = new File("/data/user/0/com.moment.whynote/files/DCIM");
-        if (!dcimDir.exists() || !dcimDir.isDirectory())
-            dcimDir.mkdirs();
-        if(!dcimDir.exists()){
-            Toast.makeText(this, "读写权限获取失败，授权后才可正常使用。", Toast.LENGTH_SHORT).show();
-        }
-        // 若是没有获取布局key， 则创建并设置值为0（默认线性布局）
-        if(sharedPreferences.getInt("LayoutManager", -1) == -1) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("LayoutManager", 0);
-            editor.putString("updateTime", String.valueOf(System.currentTimeMillis()));
-            editor.apply();
-        }
+        new Thread(()->{
+            @SuppressLint("SdCardPath") File dcimDir = new File("/data/user/0/com.moment.whynote/files/DCIM");
+            if (!dcimDir.exists() || !dcimDir.isDirectory())
+                dcimDir.mkdirs();
+            if(!dcimDir.exists()){
+                Toast.makeText(this, "读写权限获取失败，授权后才可正常使用。", Toast.LENGTH_SHORT).show();
+            }
+            // 若是没有获取布局key， 则创建并设置值为0（默认线性布局）
+            if(sharedPreferences.getInt("LayoutManager", -1) == -1) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("LayoutManager", 0);
+                editor.putString("updateTime", String.valueOf(System.currentTimeMillis()));
+                editor.apply();
+            }
+        }).start();
+
     }
 
     /**
@@ -141,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         } else if (bundle.getString("command").equals("finish")) {
             if (mService != null) {
                 mService = null;
-                Log.d(TAG, "onConnectSelected: ========");
                 this.unbindService(conn);
             }
         }

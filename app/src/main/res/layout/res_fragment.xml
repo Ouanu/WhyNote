@@ -55,20 +55,24 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="90dp"/>
 
-            <RelativeLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/res_fragment_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/title_2"
                 android:layout_marginTop="100dp"
-                android:layout_marginBottom="30dp">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/res_fragment_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never">
-                </androidx.recyclerview.widget.RecyclerView>
-            </RelativeLayout>
+                android:layout_marginBottom="30dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never">
+            </androidx.recyclerview.widget.RecyclerView>
+<!--            <RelativeLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_below="@+id/title_2"-->
+<!--                android:layout_marginTop="100dp"-->
+<!--                android:layout_marginBottom="30dp">-->
+<!--                -->
+<!--            </RelativeLayout>-->
         </RelativeLayout>
     </com.moment.whynote.view.DampScrollView>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
