@@ -29,8 +29,6 @@ public class DetailFragment extends Fragment {
     private OToolBarView toolbar;
     private ResRepository repository;
     private ResData data;
-    private String preTitle = "";
-    private String preDesc = "";
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -43,14 +41,13 @@ public class DetailFragment extends Fragment {
 
     private void initView(View view) {
         Bundle bundle = getArguments();
-        Log.d("BUNDLE>>>>>>>>>>>>>", "initView: " + bundle);
         repository = ResRepository.getInstance();
         rlRes = view.findViewById(R.id.rl_res);
         etTitle = view.findViewById(R.id.et_title);
         etDesc = view.findViewById(R.id.et_desc);
         toolbar = view.findViewById(R.id.toolbar);
         etDesc.getEditText().setBackgroundColor(0);
-        new Thread(()->{
+        new Thread(() -> {
             if (bundle.getInt("primaryKey") == 0) {
                 data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
             } else {
@@ -58,7 +55,6 @@ public class DetailFragment extends Fragment {
             }
             etTitle.setText(data.title);
             etDesc.getEditText().setText(data.desc);
-            Log.d("INIT_VIEW", "initView: " + bundle.getInt("primaryKey") );
         }).start();
 
     }
@@ -66,10 +62,14 @@ public class DetailFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        new Thread(()->{
+        new Thread(() -> {
             data.title = String.valueOf(etTitle.getText());
             data.desc = String.valueOf(etDesc.getEditText().getText());
-            repository.upResData(data);
+            if (data.title.equals("") && data.desc.equals("")) {
+                repository.deleteResData(data);
+            } else {
+                repository.upResData(data);
+            }
         }).start();
     }
 }

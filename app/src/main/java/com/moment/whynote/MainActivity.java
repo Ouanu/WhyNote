@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         conn = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.d(TAG, "绑定成功调用：onServiceConnected");
                 ControlService.ControlBinder binder = (ControlService.ControlBinder) service;
                 mService = binder.getService();
             }
