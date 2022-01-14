@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +67,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 Bundle bundle = new Bundle();
                 bundle.putInt("primaryKey", newData.uid);
                 bundle.putLong("updateDate", newData.updateDate);
+                bundle.putString("fileName", newData.fileName);
 
                 resCallback.onFragmentSelected(bundle);
             }).start();
@@ -200,7 +200,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             if (data.title.equals("")) {
                 tv_desc.setText(data.desc);
                 tv_desc.insertImage(data.desc);
-//                tv_title.setVisibility(View.GONE);
                 tv_title.setText(utils.getNowDateDefault(data.updateDate));
             } else {
                 tv_title.setText(data.title);
@@ -217,8 +216,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         public void onClick(View v) {
             Bundle bundle = new Bundle();
             bundle.putInt("primaryKey", data.uid);
-            bundle.putString("title", data.title);
-            bundle.putString("desc", data.desc);
             resCallback.onFragmentSelected(bundle);
         }
 
