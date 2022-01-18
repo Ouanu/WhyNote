@@ -1,20 +1,17 @@
 package com.moment.whynote.fragment;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,17 +24,11 @@ import com.moment.whynote.database.ResRepository;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
 import java.util.Objects;
 
 /**
@@ -83,6 +74,7 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     }
 
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_delete) {
@@ -93,7 +85,16 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
         } else if (v.getId() == R.id.btn_cp_all) {
             copyMethod(data.desc);
         } else if (v.getId() == R.id.btn_export_file) {
-            File file = new File(getString(R.string.ExternalStoragePath), "test.md");
+            File dir;
+            if (data.title.equals("")) {
+                dir = new File(getString(R.string.ExternalStoragePath), String.valueOf(data.updateDate));
+            } else {
+                dir = new File(getString(R.string.ExternalStoragePath), data.title);
+            }
+            if(!dir.exists()) {
+                dir.mkdirs();
+            }
+            File file = new File(dir, dir.getName() + ".md");
             if (!file.exists()) {
                 try {
                     file.createNewFile();
