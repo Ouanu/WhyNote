@@ -1,15 +1,19 @@
 package com.moment.whynote.fragment;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +26,18 @@ import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.util.Objects;
 
 /**
@@ -35,6 +51,7 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     private final ResRepository repository = ResRepository.getInstance();
     private Bundle bundle;
     private ResData data;
+
 
     /**
      * @return 自定义布局
@@ -56,10 +73,13 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     初始化控件
      */
     private void initView(View view) {
-        TextView btnCpAll = view.findViewById(R.id.btn_cp_all);
-        TextView btnDelete = view.findViewById(R.id.btn_delete);
+        Button btnCpAll = view.findViewById(R.id.btn_cp_all);
+        Button btnDelete = view.findViewById(R.id.btn_delete);
+        Button btnExportFile = view.findViewById(R.id.btn_export_file);
         btnCpAll.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
+        btnExportFile.setOnClickListener(this);
+
     }
 
 
@@ -72,6 +92,25 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
             }).start();
         } else if (v.getId() == R.id.btn_cp_all) {
             copyMethod(data.desc);
+        } else if (v.getId() == R.id.btn_export_file) {
+            File file = new File(getString(R.string.ExternalStoragePath), "test.md");
+            if (!file.exists()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("path", "============" + file.getName());
+            }
+            try {
+                OutputStream opt = new FileOutputStream(file, false);
+                opt.write(data.desc.getBytes());
+                opt.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
         dismiss();
     }
