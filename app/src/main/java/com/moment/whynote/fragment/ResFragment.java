@@ -61,7 +61,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 ResData newData = new ResData();
                 repository.insertData(newData);
                 @SuppressLint("SdCardPath")
-                File file = new File("/data/user/0/com.moment.whynote/files/DCIM/" + newData.updateDate);
+                File file = new File(getString(R.string.ExternalStoragePath) , String.valueOf(newData.updateDate));
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();
                 Bundle bundle = new Bundle();
