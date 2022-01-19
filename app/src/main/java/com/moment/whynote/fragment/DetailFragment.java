@@ -63,6 +63,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImageView btnGetUri;
     private static int startSelect;
 
+    private Bitmap bitmap;
+    private String DcimPath = "";
+    private boolean chosingPic = false;
+
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
@@ -128,8 +132,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         addList.setOnClickListener(this);
         btnGetUri.setOnClickListener(this);
 
-        DcimPath = getContext().getApplicationContext().getFilesDir().getAbsolutePath() + "/DCIM";
+//        DcimPath = getContext().getApplicationContext().getFilesDir().getAbsolutePath() + "/DCIM";
 
+        DcimPath = bundle.getString("dirPath");
     }
 
     @Override
@@ -139,7 +144,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             Looper.prepare();
             data.title = String.valueOf(etTitle.getText());
             data.desc = String.valueOf(etDesc.getEditText().getText());
-            if (data.title.equals("") && data.desc.equals("")) {
+            if (data.title.equals("") && data.desc.equals("") && !chosingPic) {
                 repository.deleteResData(data);
             } else {
                 repository.upResData(data);
@@ -187,6 +192,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             case R.id.btn_get_uri:
                 startSelect = etDesc.getEditText().getSelectionStart();
                 mGetContent.launch("image/*");
+                chosingPic = true;
             default:
                 break;
         }
@@ -210,8 +216,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private Bitmap bitmap;
-    private String DcimPath = "";
+
     // Activity返回结果
     private final ActivityResultLauncher<String> mGetContent = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
@@ -239,6 +244,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 //                    etDesc.getEditText().getOTools().addToolItem(new OPictureTool(etDesc.getEditText(), getContext()));
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    chosingPic = false;
                 }
             }
     );

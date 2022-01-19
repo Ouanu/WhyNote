@@ -61,14 +61,13 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 ResData newData = new ResData();
                 repository.insertData(newData);
                 @SuppressLint("SdCardPath")
-                File file = new File("/data/user/0/com.moment.whynote/files/DCIM/" + newData.fileName);
+                File file = new File("/data/user/0/com.moment.whynote/files/DCIM/" + newData.updateDate);
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();
                 Bundle bundle = new Bundle();
                 bundle.putInt("primaryKey", newData.uid);
                 bundle.putLong("updateDate", newData.updateDate);
-                bundle.putString("fileName", newData.fileName);
-
+                bundle.putString("dirPath", file.getAbsolutePath());
                 resCallback.onFragmentSelected(bundle);
             }).start();
         } else if (v.getId() == R.id.iv_change_layout) {
@@ -216,6 +215,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         public void onClick(View v) {
             Bundle bundle = new Bundle();
             bundle.putInt("primaryKey", data.uid);
+            bundle.putString("dirPath", data.dirPath);
             resCallback.onFragmentSelected(bundle);
         }
 

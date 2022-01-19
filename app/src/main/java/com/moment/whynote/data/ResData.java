@@ -26,7 +26,7 @@ public class ResData {
     @ColumnInfo(name = "updateDate")
     public long updateDate = System.currentTimeMillis();
 
-    @ColumnInfo(name = "fileName")
-    public String fileName = String.valueOf(updateDate);
+    @ColumnInfo(name = "dirPath")
+    public String dirPath= "";
 
 }
