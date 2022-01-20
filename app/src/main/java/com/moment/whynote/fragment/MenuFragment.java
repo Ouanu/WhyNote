@@ -93,7 +93,6 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Log.d("path", "============" + file.getName());
             }
             try {
                 OutputStream opt = new FileOutputStream(file, false);
@@ -102,8 +101,6 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
         dismiss();
     }
