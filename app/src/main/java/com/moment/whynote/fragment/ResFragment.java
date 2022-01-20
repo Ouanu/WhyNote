@@ -59,11 +59,12 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         if (v.getId() == R.id.insert_btn) {
             new Thread(() -> {
                 ResData newData = new ResData();
-                repository.insertData(newData);
                 @SuppressLint("SdCardPath")
                 File file = new File(getString(R.string.ExternalStoragePath) , String.valueOf(newData.updateDate));
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();
+                newData.dirPath = file.getAbsolutePath();
+                repository.insertData(newData);
                 Bundle bundle = new Bundle();
                 bundle.putInt("primaryKey", newData.uid);
                 bundle.putLong("updateDate", newData.updateDate);

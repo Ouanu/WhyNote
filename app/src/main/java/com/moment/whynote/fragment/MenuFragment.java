@@ -85,16 +85,8 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
         } else if (v.getId() == R.id.btn_cp_all) {
             copyMethod(data.desc);
         } else if (v.getId() == R.id.btn_export_file) {
-            File dir;
-            if (data.title.equals("")) {
-                dir = new File(getString(R.string.ExternalStoragePath), String.valueOf(data.updateDate));
-            } else {
-                dir = new File(getString(R.string.ExternalStoragePath), data.title);
-            }
-            if(!dir.exists()) {
-                dir.mkdirs();
-            }
-            File file = new File(dir, dir.getName() + ".md");
+            File file = new File(data.dirPath, (data.title.equals("")?data.updateDate: data.title) + ".md");
+            Log.d("MenuFragment", "onClick: " + data.dirPath);
             if (!file.exists()) {
                 try {
                     file.createNewFile();

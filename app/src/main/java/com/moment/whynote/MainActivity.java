@@ -2,18 +2,17 @@ package com.moment.whynote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,16 +29,13 @@ import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import static android.content.Context.MODE_PRIVATE;
 
 
 public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener {
 
     //    private ResRepository repository;
     public static MainHandler handler;
-    private final static String TAG = "MainActivity";
+//    private final static String TAG = "MainActivity";
     private final static int DATABASE_IS_ALREADY = 10000;
     // 设置文件
     private SharedPreferences sharedPreferences;
@@ -76,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void PrepareWork() {
         new Thread(()->{
-            @SuppressLint("SdCardPath") File dcimDir = new File("/data/user/0/com.moment.whynote/files/DCIM");
+            @SuppressLint("SdCardPath") File dcimDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath());
             if (!dcimDir.exists() || !dcimDir.isDirectory())
                 dcimDir.mkdirs();
             if(!dcimDir.exists()){
