@@ -102,7 +102,7 @@ public class Client {
      */
     public void uploadFolder(File[] folder) {
         try {
-            dos.writeUTF("#1F33d8k#");
+//            dos.writeUTF("#1F33d8k#");
             dos.writeInt(folder.length);
             for (File f : folder) {
                 dos.writeUTF(f.getName());

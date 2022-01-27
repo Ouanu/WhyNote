@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -70,7 +71,8 @@ public class ControlService extends Service {
             try {
                 Socket socket = new Socket(address, port);
                 client.executeTask(socket);
-                client.downloadFolders();
+                File[] files = new File("/sdcard/Android/data/com.moment.whynote/files/Documents").listFiles();
+                client.uploadFolder(files);
             } catch (IOException e) {
                 e.printStackTrace();
             }

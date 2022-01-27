@@ -19,7 +19,7 @@
             android:id="@+id/et_port"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="12345"
+            android:text="7290"
             android:gravity="center"/>
 
         <Button
