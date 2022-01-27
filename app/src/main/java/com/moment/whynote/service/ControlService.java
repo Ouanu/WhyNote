@@ -13,6 +13,9 @@ import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.net.Socket;
+
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 public class ControlService extends Service {
@@ -20,34 +23,23 @@ public class ControlService extends Service {
     private String address;
     private int port;
     private Looper serviceLooper;
-    private ServiceHandler serviceHandler;
+//    private ServiceHandler serviceHandler;
+    private Client client;
 
     public ControlService() {
     }
 
-    private class ServiceHandler extends Handler {
-
-        public ServiceHandler(@NonNull @NotNull Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-//            switch (msg.what) {
+//    private class ServiceHandler extends Handler {
 //
-//            }
-            try {
-                Thread.sleep(5000);
-                Log.d("ConnectService", "handleMessage: ==========");
-            } catch (InterruptedException e) {
-                // Restore interrupt status.
-                Thread.currentThread().interrupt();
-            }
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job
-            stopSelf(msg.arg1);
-        }
-    }
+//        public ServiceHandler(@NonNull @NotNull Looper looper) {
+//            super(looper);
+//        }
+//
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//
+//        }
+//    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -58,11 +50,34 @@ public class ControlService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        System.out.println("==================");
-        HandlerThread thread = new HandlerThread("ServiceStartArguments",
-                THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-        serviceLooper = thread.getLooper();
-        serviceHandler = new ServiceHandler(serviceLooper);
+        client = Client.getInstance();
+//        HandlerThread thread = new HandlerThread("ServiceStartArguments",
+//                THREAD_PRIORITY_BACKGROUND);
+//        thread.start();
+//
+//        serviceLooper = thread.getLooper();
+//        serviceHandler = new ServiceHandler(serviceLooper);
+
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+//        System.out.println(intent.getStringExtra("ip"));
+        address = intent.getStringExtra("ip");
+        port = intent.getIntExtra("port", -1);
+        new Thread(()->{
+            try {
+                Socket socket = new Socket(address, port);
+                client.executeTask(socket);
+                client.downloadFolders();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+
+
+        return super.onStartCommand(intent, flags, startId);
     }
 }

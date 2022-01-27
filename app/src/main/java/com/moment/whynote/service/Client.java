@@ -126,8 +126,8 @@ public class Client {
             dos = new DataOutputStream(socket.getOutputStream());
             is = socket.getInputStream();
             os = socket.getOutputStream();
-            dos.writeUTF("#3K55c7v#");
-            synchroServerData();
+//            dos.writeUTF("#3K55c7v#");
+//            synchroServerData();
         } catch (IOException e) {
             e.printStackTrace();
         }
