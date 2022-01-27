@@ -25,6 +25,7 @@ import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.ConnectFragment;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
+import com.moment.whynote.service.ConnectService;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
@@ -38,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     private final static int DATABASE_IS_ALREADY = 10000;
     // 设置文件
     private SharedPreferences sharedPreferences;
-    private ServiceConnection conn;
-    private ControlService mService;
 
 
     @Override
@@ -51,17 +50,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         getResRepository();
         sharedPreferences = getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
-        conn = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                ControlService.ControlBinder binder = (ControlService.ControlBinder) service;
-                mService = binder.getService();
-            }
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mService = null;
-            }
-        };
 
     }
 
@@ -132,16 +120,14 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     @Override
     public void onConnectSelected(Bundle bundle) {
         if (bundle.getString("command").equals("start")) {
-            Intent start = new Intent(this, ControlService.class);
+            Intent start = new Intent(this, ConnectService.class);
             start.putExtra("ip", bundle.getString("ip"));
             start.putExtra("port", bundle.getInt("port"));
             start.putExtra("updateTime", bundle.getString("updateTime"));
-            this.bindService(start, conn, Service.BIND_AUTO_CREATE);
+//            this.bindService(start, conn, Service.BIND_AUTO_CREATE);
+            startService(start);
         } else if (bundle.getString("command").equals("finish")) {
-            if (mService != null) {
-                mService = null;
-                this.unbindService(conn);
-            }
+
         }
 
 
