@@ -1,7 +1,6 @@
 package com.moment.whynote.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.moment.whynote.R;
-import com.moment.whynote.service.ConnectService;
 
 import org.jetbrains.annotations.NotNull;
 

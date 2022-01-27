@@ -2,15 +2,11 @@ package com.moment.whynote;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
@@ -25,7 +21,7 @@ import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.ConnectFragment;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
-import com.moment.whynote.service.ConnectService;
+import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
@@ -120,11 +116,10 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     @Override
     public void onConnectSelected(Bundle bundle) {
         if (bundle.getString("command").equals("start")) {
-            Intent start = new Intent(this, ConnectService.class);
+            Intent start = new Intent(this, ControlService.class);
             start.putExtra("ip", bundle.getString("ip"));
             start.putExtra("port", bundle.getInt("port"));
             start.putExtra("updateTime", bundle.getString("updateTime"));
-//            this.bindService(start, conn, Service.BIND_AUTO_CREATE);
             startService(start);
         } else if (bundle.getString("command").equals("finish")) {
 

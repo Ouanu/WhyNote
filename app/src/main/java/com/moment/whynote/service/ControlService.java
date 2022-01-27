@@ -2,7 +2,6 @@ package com.moment.whynote.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -11,20 +10,20 @@ import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.moment.whynote.fragment.ConnectFragment;
 
 import org.jetbrains.annotations.NotNull;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
-public class ConnectService extends Service implements ConnectFragment.ConnectListener {
+public class ControlService extends Service {
 
     private String address;
     private int port;
     private Looper serviceLooper;
     private ServiceHandler serviceHandler;
+
+    public ControlService() {
+    }
 
     private class ServiceHandler extends Handler {
 
@@ -50,33 +49,20 @@ public class ConnectService extends Service implements ConnectFragment.ConnectLi
         }
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        // TODO: Return the communication channel to the service.
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        System.out.println("==================");
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 THREAD_PRIORITY_BACKGROUND);
         thread.start();
-
-        // Get the HandlerThread's Looper and use it for our Handler
         serviceLooper = thread.getLooper();
         serviceHandler = new ServiceHandler(serviceLooper);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onConnectSelected(Bundle bundle) {
-        address = bundle.getString("ip");
-        port = bundle.getInt("port");
-        Log.d("ConnectService", "onConnectSelected: ==========");
     }
 }
