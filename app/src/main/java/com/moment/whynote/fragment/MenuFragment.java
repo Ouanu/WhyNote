@@ -1,8 +1,5 @@
 package com.moment.whynote.fragment;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -12,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,10 +60,8 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     初始化控件
      */
     private void initView(View view) {
-        Button btnCpAll = view.findViewById(R.id.btn_cp_all);
         Button btnDelete = view.findViewById(R.id.btn_delete);
         Button btnExportFile = view.findViewById(R.id.btn_export_file);
-        btnCpAll.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
         btnExportFile.setOnClickListener(this);
 
@@ -80,10 +74,16 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
         if (v.getId() == R.id.btn_delete) {
             new Thread(() -> {
                 assert bundle != null;
+                File dir = new File(data.dirPath);
+                if (dir.exists()) {
+                    for (File file : Objects.requireNonNull(dir.listFiles())) {
+                        boolean result = file.delete();
+                        System.out.println(result);
+                    }
+                    dir.delete();
+                }
                 repository.deleteResData(data);
             }).start();
-        } else if (v.getId() == R.id.btn_cp_all) {
-            copyMethod(data.desc);
         } else if (v.getId() == R.id.btn_export_file) {
             File file = new File(data.dirPath, (data.title.equals("")?data.updateDate: data.title) + ".md");
             Log.d("MenuFragment", "onClick: " + data.dirPath);
@@ -106,16 +106,17 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     }
 
 
-    //复制选项
-    private void copyMethod(String desc) {
-        if (null != requireContext().getSystemService(Context.CLIPBOARD_SERVICE)) {
-            ClipboardManager manager = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData mClipData = ClipData.newPlainText("Label", desc);
-            manager.setPrimaryClip(mClipData);
-            Toast.makeText(getContext(), desc + " 已复制成功", Toast.LENGTH_SHORT).show();
-        }
 
-    }
+    //复制选项
+//    private void copyMethod(String desc) {
+//        if (null != requireContext().getSystemService(Context.CLIPBOARD_SERVICE)) {
+//            ClipboardManager manager = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+//            ClipData mClipData = ClipData.newPlainText("Label", desc);
+//            manager.setPrimaryClip(mClipData);
+//            Toast.makeText(getContext(), desc + " 已复制成功", Toast.LENGTH_SHORT).show();
+//        }
+//
+//    }
 
 
 }
