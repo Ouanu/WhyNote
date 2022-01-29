@@ -33,6 +33,7 @@ public class ControlService extends Service {
     }
 
 
+    @SuppressLint("SdCardPath")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         address = intent.getStringExtra("ip");
@@ -41,9 +42,10 @@ public class ControlService extends Service {
             try {
                 Socket socket = new Socket(address, port);
                 client.executeTask(socket);
-                @SuppressLint("SdCardPath")
                 File[] files = new File("/sdcard/Android/data/com.moment.whynote/files/Documents").listFiles();
                 client.uploadFolder(files);
+                client.insertFiles("/data/data/com.moment.whynote/databases");
+                client.upload();
             } catch (IOException e) {
                 e.printStackTrace();
             }
