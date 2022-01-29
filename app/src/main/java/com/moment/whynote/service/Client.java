@@ -17,15 +17,12 @@ import java.util.Objects;
 import java.util.Queue;
 
 public class Client {
-    private final static String address = "127.0.0.1";
-    private final static int port = 7290;
     private static volatile Client instance;
     private DataInputStream dis;
     private DataOutputStream dos;
     private OutputStream os;
     private InputStream is;
     private final Queue<File> fileQueue = new LinkedList<>();
-//    private Socket socket;
 
     public static Client getInstance() {
         if (instance == null) {
@@ -39,11 +36,7 @@ public class Client {
     }
 
     public Client() {
-//        try {
-//            socket = new Socket(address, port);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
     }
 
     public void insertFiles(String path) {
@@ -126,8 +119,6 @@ public class Client {
             dos = new DataOutputStream(socket.getOutputStream());
             is = socket.getInputStream();
             os = socket.getOutputStream();
-//            dos.writeUTF("#3K55c7v#");
-//            synchroServerData();
         } catch (IOException e) {
             e.printStackTrace();
         }
