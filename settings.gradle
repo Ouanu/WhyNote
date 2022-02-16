@@ -1,2 +1,3 @@
 rootProject.name = "WhyNote"
 include ':app'
+include ':opencv'

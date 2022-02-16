@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 
+
 public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener {
 
     //    private ResRepository repository;
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     // 设置文件
     private SharedPreferences sharedPreferences;
 
+//    static {
+//        System.loadLibrary("opencv");
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
