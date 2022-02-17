@@ -29,6 +29,7 @@ android {
 
 dependencies {
     implementation 'org.jetbrains:annotations:15.0'
+    implementation project(path: ':opencv')
     def room_version = "2.3.0"
 
     implementation "androidx.room:room-runtime:$room_version"
@@ -43,5 +44,6 @@ dependencies {
 
 
     implementation 'com.github.Ouanu:OEditTextView:v0.0.2'
+
 
 }
