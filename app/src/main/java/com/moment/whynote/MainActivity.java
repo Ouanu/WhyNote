@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
         getResRepository();
         sharedPreferences = getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
-
     }
 
     /**
