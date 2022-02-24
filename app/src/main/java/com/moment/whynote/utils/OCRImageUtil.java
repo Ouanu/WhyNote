@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
+import com.moment.whynote.ml.Model;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -16,23 +18,58 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.tensorflow.lite.DataType;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import static org.opencv.imgproc.Imgproc.boundingRect;
 import static org.opencv.imgproc.Imgproc.drawContours;
 
 
 public class OCRImageUtil {
-    private Context mContext;
+    private static Context mContext = null;
     private LinkedList<Mat> matQueue = new LinkedList<>();
+    private volatile static OCRImageUtil instance = null;
+    private Model model = null;
+    private TensorBuffer inputFeature0;
+    private Model.Outputs outputs;
+
+    public static OCRImageUtil getInstance() {
+        if (instance == null) {
+            synchronized (OCRImageUtil.class) {
+                if (instance == null) {
+                    return new OCRImageUtil(mContext);
+                }
+            }
+        }
+        return instance;
+    }
 
     public OCRImageUtil(Context mContext) {
         this.mContext = mContext;
+        new Thread(()->{
+            try {
+                model = Model.newInstance(mContext);
+
+                // Creates inputs for reference.
+                inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 30, 30, 1}, DataType.FLOAT32);
+//                inputFeature0.loadBuffer(byteBuffer);
+
+                // Runs model inference and gets result.
+//                Model.Outputs outputs = model.process(inputFeature0);
+//                TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+                // Releases model resources if no longer used.
+//            model.close();
+            } catch (IOException e) {
+                // TODO Handle the exception
+            }
+        }).start();
+
     }
 
     public void execute(Uri uri){

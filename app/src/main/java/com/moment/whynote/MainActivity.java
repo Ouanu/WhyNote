@@ -124,9 +124,10 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
             start.putExtra("port", bundle.getInt("port"));
             start.putExtra("updateTime", bundle.getString("updateTime"));
             startService(start);
-        } else if (bundle.getString("command").equals("finish")) {
-
         }
+//         else if (bundle.getString("command").equals("finish")) {
+//
+//        }
 
 
     }
