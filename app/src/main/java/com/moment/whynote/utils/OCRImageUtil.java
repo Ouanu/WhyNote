@@ -29,6 +29,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
@@ -107,6 +108,7 @@ public class OCRImageUtil {
         Model.Outputs outputs = model.process(inputFeature0);
         TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
         System.out.println("result=====" + outputFeature0.getIntValue(0));
+
     }
 
     /**
@@ -157,7 +159,7 @@ public class OCRImageUtil {
 
     private ByteBuffer getMatFloat() {
         Mat example = new Mat();
-        example = matQueue.get(30);
+        example = matQueue.get(0);
         resize(example, example, new Size(30, 30));
         int channel = example.channels();
         float g;
@@ -168,10 +170,12 @@ public class OCRImageUtil {
             for (int j = 0; j < 30; j++) {
                 example.get(i, j, data);
                 g = data[0]&0xff;
-                g = g / 128.0f;
+                g = g / 255.0f;
                 imageMat[0][i][j][0] = g;
+                System.out.println(g);
             }
         }
+
         return ByteBuffer.wrap(floatArrayToByteArray(imageMat));
     }
 

@@ -96,7 +96,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 //            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 //                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
 //            connectFragment.show(manager, "NULL");
-            OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/text2.jpg"));
+            OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/2.png"));
 
         }
     }
