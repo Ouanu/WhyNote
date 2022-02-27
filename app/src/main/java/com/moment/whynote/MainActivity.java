@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -22,8 +23,11 @@ import com.moment.whynote.fragment.ConnectFragment;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
 import com.moment.whynote.service.ControlService;
+import com.moment.whynote.utils.OCRImageUtil;
 
 import org.jetbrains.annotations.NotNull;
+import org.opencv.android.OpenCVLoader;
+
 import java.io.File;
 
 
@@ -45,11 +49,25 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 222);
         handler = new MainHandler(this.getMainLooper());
         getResRepository();
         sharedPreferences = getSharedPreferences("setting", MODE_PRIVATE);
         PrepareWork();
+        initLoadOpenCV();
+        getOCRImageUtil();
+
+
+    }
+
+    private void initLoadOpenCV() {
+        boolean success = OpenCVLoader.initDebug();
+        if (success) {
+            Toast.makeText(this.getApplicationContext(), "Loading Opencv Libraries", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this.getApplicationContext(), "WARNING：COULD NOT LOAD Opencv Libraries!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -73,6 +91,16 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
             }
         }).start();
 
+    }
+
+    /**
+     * 加载OCR模型及图片处理工具
+     */
+    private void getOCRImageUtil(){
+        new Thread(()->{
+            OCRImageUtil ocrImageUtil = new OCRImageUtil(this);
+//            OCRImageUtil.getInstance().execute(getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/1643436803405/1643436807651.jpg"));
+        }).start();
     }
 
     /**

@@ -3,6 +3,7 @@ package com.moment.whynote.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
+import com.moment.whynote.utils.OCRImageUtil;
 import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
 
@@ -90,10 +92,12 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             }
             editor.apply();
         } else if (v.getId() == R.id.title_2) {
-            ConnectFragment connectFragment = new ConnectFragment();
-            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
-            connectFragment.show(manager, "NULL");
+//            ConnectFragment connectFragment = new ConnectFragment();
+//            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
+//            connectFragment.show(manager, "NULL");
+            OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/text2.jpg"));
+
         }
     }
 
