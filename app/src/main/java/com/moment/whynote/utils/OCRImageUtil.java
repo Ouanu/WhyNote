@@ -149,7 +149,6 @@ public class OCRImageUtil {
 
             System.out.println("the image is done" + matQueue.size());
 
-            workState = false;
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -160,8 +159,6 @@ public class OCRImageUtil {
         Mat example = new Mat();
         example = matQueue.get(30);
         resize(example, example, new Size(30, 30));
-        int width = example.width();
-        int height = example.height();
         int channel = example.channels();
         float g;
 
