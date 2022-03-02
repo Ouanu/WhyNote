@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -28,6 +29,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
@@ -46,16 +48,10 @@ public class OCRImageUtil {
     private static Context mContext = null;
     private LinkedList<Mat> matQueue = new LinkedList<>();
     private LinkedList<Bitmap> bitmaps = new LinkedList<>();
-    private static boolean workState = true;
     private volatile static OCRImageUtil instance = null;
     private Model model = null;
-    private MappedByteBuffer tfliteModel = null;
     private TensorBuffer inputFeature0;
-    private Model.Outputs outputs;
-    private static final float[][][][] imageMat = new float[1][30][30][1];
-    private ImageProcessor processor = null;
-    private TensorImage tImage = null;
-    private Interpreter tflite;
+    private int[] ddims = {1, 30, 30, 1};
 
     public static OCRImageUtil getInstance() {
         if (instance == null) {
@@ -76,14 +72,6 @@ public class OCRImageUtil {
             // Creates inputs for reference.
             inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 30, 30, 1}, DataType.FLOAT32);
 
-//            inputFeature0.loadBuffer(byteBuffer);
-            // Runs model inference and gets result.
-//                Model.Outputs outputs = model.process(inputFeature0);
-//                TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-
-            // Releases model resources if no longer used.
-//            model.close();
-
             Log.d("OCRImageUtil:", "The image util is ready. " + inputFeature0.getShape().length);
         } catch (IOException e) {
             // TODO Handle the exception
@@ -98,16 +86,25 @@ public class OCRImageUtil {
             proSrc2Gray(contentResolver, uri);
             ocr();
         }).start();
-//        new Thread(()->{
-//            ocr();
-//        }).start();
     }
 
     private void ocr() {
         inputFeature0.loadBuffer(getMatFloat());
         Model.Outputs outputs = model.process(inputFeature0);
         TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-        System.out.println("result=====" + outputFeature0.getIntValue(0));
+        float max = 0f;
+        int cnt = 0;
+        int d = 0;
+        for (float v : outputFeature0.getFloatArray()) {
+            if(max <= v) {
+                max = v;
+                d = cnt;
+
+            }
+//            System.out.println(v);
+            cnt ++;
+        }
+        System.out.println(max + ", " + d);
 
     }
 
@@ -146,6 +143,11 @@ public class OCRImageUtil {
                     continue;
                 Rect rect = boundingRect(counts.get(i));
                 matQueue.add(grayMat.submat(rect));
+                Mat mat = matQueue.getLast();
+                resize(mat, mat, new Size(30, 30));
+                Bitmap bm = Bitmap.createBitmap(ddims[1], ddims[2], Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(mat, bm);
+                bitmaps.add(bm);
 //                System.out.println("mat===" + ROI.get(i, i));
             }
 
@@ -158,25 +160,32 @@ public class OCRImageUtil {
 
 
     private ByteBuffer getMatFloat() {
-        Mat example = new Mat();
-        example = matQueue.get(0);
-        resize(example, example, new Size(30, 30));
-        int channel = example.channels();
-        float g;
-
-        byte[] data = new byte[channel];
-
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                example.get(i, j, data);
-                g = data[0]&0xff;
-                g = g / 255.0f;
-                imageMat[0][i][j][0] = g;
-                System.out.println(g);
+        //新建一个1*256*256*3的四维数组
+        float[][][][] inFloat = new float[ddims[0]][ddims[1]][ddims[2]][ddims[3]];
+        //新建一个一维数组，长度是图片像素点的数量
+        int[] pixels = new int[ddims[1] * ddims[2]];
+        //把原图缩放成我们需要的图片大小
+        Bitmap bm = Bitmap.createScaledBitmap(bitmaps.getLast(), ddims[1], ddims[2], false);
+        //把图片的每个像素点的值放到我们前面新建的一维数组中
+        bm.getPixels(pixels, 0, bm.getWidth(), 0, 0, ddims[1], ddims[2]);
+        int pixel = 0;
+        //for循环，把每个像素点的值转换成RBG的值，存放到我们的目标数组中
+        for (int i = 0; i < ddims[1]; ++i) {
+            for (int j = 0; j < ddims[2]; ++j) {
+                final int val = pixels[pixel++];
+//                float red = ((val >> 16) & 0xFF);
+//                float green = ((val >> 8) & 0xFF);
+                float gray = (val & 0xFF);
+                gray = gray / 255.0f;
+                float[] arr = {gray};
+                inFloat[0][i][j] = arr;
+//                System.out.println(arr[0]);
             }
         }
-
-        return ByteBuffer.wrap(floatArrayToByteArray(imageMat));
+        if (bm.isRecycled()) {
+            bm.recycle();
+        }
+        return ByteBuffer.wrap(floatArrayToByteArray(inFloat));
     }
 
     private static byte[] floatArrayToByteArray(float[][][][] data) {
@@ -191,6 +200,8 @@ public class OCRImageUtil {
                 }
             }
         }
-        return out.toByteArray();
+        byte[] b = out.toByteArray();
+
+        return b;
     }
 }
