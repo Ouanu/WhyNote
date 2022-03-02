@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
-
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener {
@@ -98,7 +98,11 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
      */
     private void getOCRImageUtil(){
         new Thread(()->{
-            OCRImageUtil ocrImageUtil = new OCRImageUtil(this);
+            try {
+                OCRImageUtil ocrImageUtil = new OCRImageUtil(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 //            OCRImageUtil.getInstance().execute(getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/1643436803405/1643436807651.jpg"));
         }).start();
     }
