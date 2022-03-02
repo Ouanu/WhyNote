@@ -36,7 +36,7 @@ import static org.opencv.imgproc.Imgproc.resize;
 
 public class OCRImageUtil {
     @SuppressLint("StaticFieldLeak")
-    private static final Context mContext = null;
+    private static Context mContext = null;
     private final LinkedList<Mat> matQueue = new LinkedList<>();
     private final LinkedList<Bitmap> bitmaps = new LinkedList<>();
     @SuppressLint("StaticFieldLeak")
@@ -47,23 +47,33 @@ public class OCRImageUtil {
     private final Interpreter tfLite;
     private static final String MODEL_PATH = "model.tflite";
 
+    /**
+     * 获取单例
+     * @return 返回实例
+     * @throws IOException
+     */
     @SuppressWarnings("all")
     public static OCRImageUtil getInstance() throws IOException {
         if (instance == null) {
             synchronized (OCRImageUtil.class) {
-                return new OCRImageUtil(mContext);
+                if (instance == null) {
+                    return new OCRImageUtil(mContext);
+                }
             }
         }
         return instance;
     }
 
+    /**
+     * 初始化OCRImageUtil
+     */
     public OCRImageUtil(Context mContext) throws IOException {
         tfLite = new Interpreter(loadModelFile(mContext));
+        OCRImageUtil.mContext = mContext;
     }
 
     /**
      * 加载模型
-     *
      * @return ByteBuffer
      */
     private ByteBuffer loadModelFile(Context mContext) throws IOException {
@@ -76,6 +86,11 @@ public class OCRImageUtil {
     }
 
 
+    /**
+     * 执行任务
+     * @param contentResolver 获取内容解析者
+     * @param uri 获取文件链接
+     */
     public void execute(ContentResolver contentResolver, Uri uri) {
         new Thread(() -> {
             proSrc2Gray(contentResolver, uri);
@@ -83,6 +98,10 @@ public class OCRImageUtil {
         }).start();
     }
 
+    /**
+     * OCR识别
+     * 获取精度最高的标签
+     */
     private void ocr() {
         tfLite.run(inputMat, out);
         float max = 0;
@@ -95,7 +114,8 @@ public class OCRImageUtil {
             }
             cnt++;
         }
-        System.out.println("result=====" + max + ", " + d);
+        if(max >= 0.9f)
+            System.out.println("result=====" + max + ", " + d);
     }
 
     /**

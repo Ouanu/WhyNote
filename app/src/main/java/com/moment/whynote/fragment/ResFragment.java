@@ -34,6 +34,7 @@ import com.moment.whynote.viewmodel.ResViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class ResFragment extends Fragment implements View.OnClickListener {
@@ -96,7 +97,11 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 //            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 //                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
 //            connectFragment.show(manager, "NULL");
-            OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/321.png"));
+            try {
+                OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/321.png"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         }
     }
