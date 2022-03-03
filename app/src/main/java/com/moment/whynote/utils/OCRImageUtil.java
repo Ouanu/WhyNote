@@ -21,8 +21,11 @@ import org.opencv.imgproc.Imgproc;
 import org.tensorflow.lite.Interpreter;
 
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -46,6 +49,8 @@ public class OCRImageUtil {
     private final float[][] out = new float[1][3755];
     private final Interpreter tfLite;
     private static final String MODEL_PATH = "model.tflite";
+    private static final char[] labels = new char[3755];
+    StringBuffer strBuffer = new StringBuffer();
 
     /**
      * 获取单例
@@ -70,6 +75,7 @@ public class OCRImageUtil {
     public OCRImageUtil(Context mContext) throws IOException {
         tfLite = new Interpreter(loadModelFile(mContext));
         OCRImageUtil.mContext = mContext;
+        getLabels();
     }
 
     /**
@@ -103,19 +109,30 @@ public class OCRImageUtil {
      * 获取精度最高的标签
      */
     private void ocr() {
-        tfLite.run(inputMat, out);
-        float max = 0;
-        int cnt = 0;
-        int d = 0;
-        for (int i = 0; i < out[0].length; i++) {
-            if (max < out[0][i]) {
-                max = out[0][i];
-                d = cnt;
+
+        for (Bitmap bitmap : bitmaps) {
+            //把原图缩放成我们需要的图片大小
+            Bitmap bm = Bitmap.createScaledBitmap(bitmap, dims[1], dims[2], false);
+            inputMat = getMatFloat(bm);
+
+            tfLite.run(inputMat, out);
+            float max = 0;
+            int cnt = 0;
+            int d = 0;
+            for (int i = 0; i < out[0].length; i++) {
+                if (max < out[0][i]) {
+                    max = out[0][i];
+                    d = cnt;
+                }
+                cnt++;
             }
-            cnt++;
+            if(max >= 0f)
+                strBuffer.append(labels[d]);
         }
-        if(max >= 0.9f)
-            System.out.println("result=====" + max + ", " + d);
+
+        System.out.println(strBuffer.toString());
+
+
     }
 
     /**
@@ -147,18 +164,17 @@ public class OCRImageUtil {
             Imgproc.findContours(erode, counts, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_TC89_L1, new Point(0, 0));
             drawContours(erode, counts, -1, new Scalar(255, 0, 255), 1);
             for (int i = 0; i < counts.size(); i++) {
-                if (Imgproc.contourArea(counts.get(i)) < 300)
+                if (Imgproc.contourArea(counts.get(i)) < 100)
                     continue;
                 Rect rect = boundingRect(counts.get(i));
                 matQueue.add(grayMat.submat(rect));
                 Mat mat = matQueue.getLast();
-                resize(mat, mat, new Size(30, 30));
-                Bitmap bm = Bitmap.createBitmap(dims[1], dims[2], Bitmap.Config.ARGB_8888);
+                Bitmap bm = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(mat, bm);
                 bitmaps.add(bm);
             }
             System.out.println("the image is done" + matQueue.size());
-            inputMat = getMatFloat();
+
         } catch (IOException e) {
             Log.d("OCRImageUtil", e.getMessage());
         }
@@ -168,17 +184,14 @@ public class OCRImageUtil {
      * 将 Mat 转换为 float[][][][]数组（输入格式）
      * @return 返回数组
      */
-    private float[][][][] getMatFloat() {
-        //新建一个1*256*256*3的四维数组
+    private float[][][][] getMatFloat(Bitmap bm) {
         float[][][][] inFloat = new float[dims[0]][dims[1]][dims[2]][dims[3]];
         //新建一个一维数组，长度是图片像素点的数量
         int[] pixels = new int[dims[1] * dims[2]];
-        //把原图缩放成我们需要的图片大小
-        Bitmap bm = Bitmap.createScaledBitmap(bitmaps.getLast(), dims[1], dims[2], false);
+
         //把图片的每个像素点的值放到我们前面新建的一维数组中
         bm.getPixels(pixels, 0, bm.getWidth(), 0, 0, dims[1], dims[2]);
         int pixel = 0;
-        //for循环，把每个像素点的值转换成RBG的值，存放到我们的目标数组中
         for (int i = 0; i < dims[1]; ++i) {
             for (int j = 0; j < dims[2]; ++j) {
                 final int val = pixels[pixel++];
@@ -192,6 +205,25 @@ public class OCRImageUtil {
             bm.recycle();
         }
         return inFloat;
+    }
+
+    public void getLabels() throws IOException {
+        InputStream ins = mContext.getAssets().open("labels.txt");
+        InputStreamReader reader = new InputStreamReader(ins, "GBK");
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        String line = " ";
+        int i=0;
+        while ((line = bufferedReader.readLine()) != null) {
+            line.replace(",","");
+            for (int j = 0; j < line.length(); j++) {
+                if (Character.isDigit(line.charAt(j))) {
+                    continue;
+                } else {
+                    labels[i] = line.charAt(j);
+                }
+            }
+            i++;
+        }
     }
 
 }
