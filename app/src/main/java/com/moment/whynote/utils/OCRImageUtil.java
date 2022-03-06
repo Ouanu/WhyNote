@@ -5,12 +5,16 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.moment.whynote.R;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -34,6 +38,7 @@ import java.util.List;
 
 import static org.opencv.imgproc.Imgproc.boundingRect;
 import static org.opencv.imgproc.Imgproc.drawContours;
+import static org.opencv.imgproc.Imgproc.rectangle;
 import static org.opencv.imgproc.Imgproc.resize;
 
 
@@ -114,7 +119,6 @@ public class OCRImageUtil {
             //把原图缩放成我们需要的图片大小
             Bitmap bm = Bitmap.createScaledBitmap(bitmap, dims[1], dims[2], false);
             inputMat = getMatFloat(bm);
-
             tfLite.run(inputMat, out);
             float max = 0;
             int cnt = 0;
@@ -126,8 +130,10 @@ public class OCRImageUtil {
                 }
                 cnt++;
             }
-            if(max >= 0f)
+            if(max >= 0.5f)
                 strBuffer.append(labels[d]);
+            else
+                strBuffer.append(' ');
         }
 
         System.out.println(strBuffer.toString());
@@ -146,14 +152,18 @@ public class OCRImageUtil {
         Mat bin = new Mat();
         Bitmap srcBitmap;
         try {
-            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            InputStream ins = contentResolver.openInputStream(uri);
+//            srcBitmap = BitmapFactory.decodeStream(ins);
+//            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            srcBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.text2);
+
             //对图片进行灰度化
             Utils.bitmapToMat(srcBitmap, rgbMat);
             Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
             // 利用OTSU二值化，将文本行与背景分割
             Imgproc.threshold(grayMat, bin, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
             //通过形态学腐蚀，将分割出来的文字字符连接在一起
-            Mat rec = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, 20), new Point(-1, -1));
+            Mat rec = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, 20), new Point(-1,-1));
             Mat dilate = new Mat();
             Imgproc.erode(bin, dilate, rec);
             Mat erode = new Mat();
@@ -163,17 +173,71 @@ public class OCRImageUtil {
             Mat hierarchy = new Mat();
             Imgproc.findContours(erode, counts, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_TC89_L1, new Point(0, 0));
             drawContours(erode, counts, -1, new Scalar(255, 0, 255), 1);
-            for (int i = 0; i < counts.size(); i++) {
-                if (Imgproc.contourArea(counts.get(i)) < 100)
+            int bitmapMax = 0;
+            Mat kernel = new Mat(3, 3, CvType.CV_32FC1);
+            float[] arrayFloat = new float[]{0F, -1F, 0F, -1F, 5F, -1F, 0F, -1F, 0F};
+            kernel.put(0, 0, arrayFloat);
+            List<Rect> axisX = new ArrayList<>(counts.size());
+            for (MatOfPoint matOfPoint : counts) {
+                if (Imgproc.contourArea(matOfPoint) < 200)
                     continue;
-                Rect rect = boundingRect(counts.get(i));
+                Rect cntRect = Imgproc.boundingRect(matOfPoint);
+                int index;
+                for (index = 0;  index < axisX.size(); index ++) {
+                    if(axisX.get(index).x > cntRect.x){
+                        break;
+                    }
+                }
+                axisX.add(index, cntRect);
+            }
+            List<Rect> axisY = new ArrayList<>(axisX.size());
+            for (Rect x : axisX) {
+                int index;
+                for (index = 0; index < axisY.size(); index++) {
+                    if(axisY.get(index).y > x.y + 10 ) {
+                        break;
+                    }
+                }
+                axisY.add(index, x);
+            }
+
+//            for (Rect rect : axisY) {
+//                System.out.println("x:" + rect.x + " y:" + rect.y);
+//            }
+            for (Rect rect : axisY) {
+//                if (Imgproc.contourArea(counts.get(i)) < 300)
+//                    continue;
+//                Rect rect = boundingRect(counts.get(i));
+//                matQueue.add(grayMat.submat(rect));
+//                Mat mat = matQueue.getLast();
+//                if (Imgproc.contourArea(counts.get(i)) < 300)
+//                    continue;
+//                Rect rect = boundingRect(counts.get(i));
                 matQueue.add(grayMat.submat(rect));
                 Mat mat = matQueue.getLast();
-                Bitmap bm = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(mat, bm);
-                bitmaps.add(bm);
+                resize(mat, mat, new Size(30, 30));
+                Bitmap bm = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888);
+                Core.bitwise_not(mat, mat);
+                if ((mat.width()/2) > bitmapMax) {
+                    bitmapMax = mat.width() / 2;
+                }
+                if(mat.width() > bitmapMax && mat.height() > bitmapMax) {
+                    Imgproc.filter2D(mat,
+                            mat,
+                            -1,
+                            kernel,
+                            new Point(-1, -1),
+                            Core.BORDER_CONSTANT
+                            );
+                    Imgproc.Sobel(mat, mat, -1 , 1, 1, 3);
+                    Utils.matToBitmap(mat, bm);
+                    rectangle(grayMat, rect, new Scalar(34, 25, 25, 33), 1);
+                    bitmaps.add(bm);
+                }
+//                Bitmap bm = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
+
             }
-            System.out.println("the image is done" + matQueue.size());
+            System.out.println("the image is done" + bitmaps.size());
 
         } catch (IOException e) {
             Log.d("OCRImageUtil", e.getMessage());
