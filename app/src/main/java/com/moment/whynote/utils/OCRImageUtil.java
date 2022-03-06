@@ -229,7 +229,6 @@ public class OCRImageUtil {
                             new Point(-1, -1),
                             Core.BORDER_CONSTANT
                             );
-                    Imgproc.Sobel(mat, mat, -1 , 1, 1, 3);
                     Utils.matToBitmap(mat, bm);
                     rectangle(grayMat, rect, new Scalar(34, 25, 25, 33), 1);
                     bitmaps.add(bm);
