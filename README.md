@@ -3,7 +3,7 @@
 
 *数据库：ROOM*
 
-*富文本控件库：OEditTextView （来源于我自己）*
+*富文本控件库：OEditTextView （https://github.com/Ouanu/OEditTextView）*
 
 *使用方法：*
   `dependencies {
