@@ -4,12 +4,18 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+
+import com.googlecode.tesseract.android.TessBaseAPI;
 import com.moment.whynote.R;
 
 import org.opencv.android.Utils;
@@ -21,11 +27,13 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.tensorflow.lite.Interpreter;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +43,9 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
-import static org.opencv.imgproc.Imgproc.boundingRect;
+import static org.opencv.imgproc.Imgproc.Canny;
 import static org.opencv.imgproc.Imgproc.drawContours;
 import static org.opencv.imgproc.Imgproc.rectangle;
 import static org.opencv.imgproc.Imgproc.resize;
@@ -53,9 +62,10 @@ public class OCRImageUtil {
     private float[][][][] inputMat = new float[1][30][30][1];
     private final float[][] out = new float[1][3755];
     private final Interpreter tfLite;
-    private static final String MODEL_PATH = "model.tflite";
+    private static final String MODEL_PATH = "model2.tflite";
     private static final char[] labels = new char[3755];
     StringBuffer strBuffer = new StringBuffer();
+    private static final String DATAPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
 
     /**
      * 获取单例
@@ -104,8 +114,25 @@ public class OCRImageUtil {
      */
     public void execute(ContentResolver contentResolver, Uri uri) {
         new Thread(() -> {
-            proSrc2Gray(contentResolver, uri);
-            ocr();
+//            proSrc2Gray(contentResolver, uri);
+//            ocr();
+            Bitmap bitmap = null;
+            try {
+                bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.text2);
+                TessBaseAPI tessBaseAPI = new TessBaseAPI();
+//                InputStream open = mContext.getAssets().open("chi_sim.trainedata");
+
+//                String DEFAULT_LANGUAGE = "chi_sim";
+                tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "chi_sim");
+                tessBaseAPI.setImage(bitmap);
+                String text = tessBaseAPI.getUTF8Text();
+                Log.i("hgfhgfhfghfg", "run: text " + System.currentTimeMillis() + text);
+
+                tessBaseAPI.end();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }).start();
     }
 
@@ -152,14 +179,15 @@ public class OCRImageUtil {
         Mat bin = new Mat();
         Bitmap srcBitmap;
         try {
-            InputStream ins = contentResolver.openInputStream(uri);
-//            srcBitmap = BitmapFactory.decodeStream(ins);
-//            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
-            srcBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.text2);
+            grayMat = Imgcodecs.imread(uri.getPath(), Imgcodecs.IMREAD_GRAYSCALE);
+//            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri).setDensity(MediaStore.EXTRA_OUTPUT);
+//            srcBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri));
+//            System.out.println(srcBitmap.getWidth() + " "+ srcBitmap.getHeight() + ";;; " + src2Bitmap.getWidth() + " "+ src2Bitmap.getHeight());
 
             //对图片进行灰度化
-            Utils.bitmapToMat(srcBitmap, rgbMat);
-            Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
+//            Utils.bitmapToMat(srcBitmap, rgbMat);
+//            Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
+            grayMat = houghLines(grayMat);
             // 利用OTSU二值化，将文本行与背景分割
             Imgproc.threshold(grayMat, bin, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
             //通过形态学腐蚀，将分割出来的文字字符连接在一起
@@ -201,18 +229,8 @@ public class OCRImageUtil {
                 axisY.add(index, x);
             }
 
-//            for (Rect rect : axisY) {
-//                System.out.println("x:" + rect.x + " y:" + rect.y);
-//            }
             for (Rect rect : axisY) {
-//                if (Imgproc.contourArea(counts.get(i)) < 300)
-//                    continue;
-//                Rect rect = boundingRect(counts.get(i));
-//                matQueue.add(grayMat.submat(rect));
-//                Mat mat = matQueue.getLast();
-//                if (Imgproc.contourArea(counts.get(i)) < 300)
-//                    continue;
-//                Rect rect = boundingRect(counts.get(i));
+
                 matQueue.add(grayMat.submat(rect));
                 Mat mat = matQueue.getLast();
                 resize(mat, mat, new Size(30, 30));
@@ -238,7 +256,7 @@ public class OCRImageUtil {
             }
             System.out.println("the image is done" + bitmaps.size());
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.d("OCRImageUtil", e.getMessage());
         }
     }
@@ -287,6 +305,54 @@ public class OCRImageUtil {
             }
             i++;
         }
+    }
+
+    /**
+     * 图形矫正
+     * @param mat 传入灰度图 Mat
+     * @return 返回矫正后的图片
+     */
+    public Mat houghLines(Mat mat) {
+        Mat backup = mat.clone();
+        Mat lines = new Mat();
+        Imgproc.Canny(mat, lines, 100 ,200, 3);
+        Imgproc.HoughLines(lines, lines, 1, Math.PI/180.0, 200, 0, 0);
+        double sum = 0;
+        double angle=0;
+        for (int x = 0; x < lines.rows(); x++) {
+            double[] vec = lines.get(x, 0);
+
+            double rho = vec[0];
+            double theta = vec[1];
+
+            Point pt1 = new Point();
+            Point pt2 = new Point();
+
+            double a = Math.cos(theta);
+            double b = Math.sin(theta);
+
+            double x0 = a * rho;
+            double y0 = b * rho;
+
+            pt1.x = Math.round(x0 + 1000 * (-b));
+            pt1.y = Math.round(y0 + 1000 * (a));
+            pt2.x = Math.round(x0 - 1000 * (-b));
+            pt2.y = Math.round(y0 - 1000 * (a));
+            sum += theta;
+            Imgproc.line(mat, pt1, pt2, new Scalar(0, 0, 255), 1, Imgproc.LINE_4, 0);
+        }
+
+        double average = sum / lines.rows(); //对所有角度求平均，这样做旋转效果会更好
+        angle = average/ Math.PI * 180 - 90;
+        System.out.println("average:"+angle);
+        Point center=new Point();
+        center.x=mat.cols()/2;
+        center.y=mat.rows()/2;
+
+// 得到旋转矩阵算子
+        Mat matrix = Imgproc.getRotationMatrix2D(center, angle, 1);
+        Imgproc.warpAffine(backup, backup, matrix, backup.size(), 1, 0, new Scalar(0, 0, 0));
+        return backup;
     }
 
 }

@@ -50,5 +50,7 @@ dependencies {
 
     implementation 'com.github.Ouanu:OEditTextView:v0.0.2'
 
+    implementation 'com.rmtheis:tess-two:9.1.0'
+
 
 }
