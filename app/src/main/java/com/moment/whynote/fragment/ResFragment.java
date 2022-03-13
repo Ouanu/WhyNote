@@ -2,13 +2,10 @@ package com.moment.whynote.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.net.Uri;
+
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +14,9 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -34,15 +29,10 @@ import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
-import com.moment.whynote.utils.OCRImageUtil;
 import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 public class ResFragment extends Fragment implements View.OnClickListener {
@@ -101,15 +91,10 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             }
             editor.apply();
         } else if (v.getId() == R.id.title_2) {
-//            ConnectFragment connectFragment = new ConnectFragment();
-//            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
-//            connectFragment.show(manager, "NULL");
-//            try {
-//                OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/添加Vitamio插件变成万能播放器.jpg"));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            ConnectFragment connectFragment = new ConnectFragment();
+            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
+            connectFragment.show(manager, "NULL");
 
         }
     }

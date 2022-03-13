@@ -4,19 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
 
 import com.googlecode.tesseract.android.TessBaseAPI;
-import com.moment.whynote.R;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -33,7 +29,6 @@ import org.tensorflow.lite.Interpreter;
 
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,9 +38,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
-import static org.opencv.imgproc.Imgproc.Canny;
 import static org.opencv.imgproc.Imgproc.drawContours;
 import static org.opencv.imgproc.Imgproc.rectangle;
 import static org.opencv.imgproc.Imgproc.resize;
@@ -59,16 +52,15 @@ public class OCRImageUtil {
     @SuppressLint("StaticFieldLeak")
     private static final OCRImageUtil instance = null;
     private final int[] dims = {1, 30, 30, 1};
-    private float[][][][] inputMat = new float[1][30][30][1];
     private final float[][] out = new float[1][3755];
     private final Interpreter tfLite;
     private static final String MODEL_PATH = "model2.tflite";
     private static final char[] labels = new char[3755];
     StringBuffer strBuffer = new StringBuffer();
-    private static final String DATAPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
 
     /**
      * 获取单例
+     *
      * @return 返回实例
      * @throws IOException
      */
@@ -95,6 +87,7 @@ public class OCRImageUtil {
 
     /**
      * 加载模型
+     *
      * @return ByteBuffer
      */
     private ByteBuffer loadModelFile(Context mContext) throws IOException {
@@ -109,18 +102,20 @@ public class OCRImageUtil {
 
     /**
      * 执行任务
+     *
      * @param contentResolver 获取内容解析者
-     * @param uri 获取文件链接
+     * @param uri             获取文件链接
      */
+    @SuppressLint("SdCardPath")
     public String execute(ContentResolver contentResolver, Uri uri) {
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         String text = "";
         try {
             bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
             TessBaseAPI tessBaseAPI = new TessBaseAPI();
             tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "chi_sim");
             tessBaseAPI.setImage(bitmap);
-            text= tessBaseAPI.getUTF8Text();
+            text = tessBaseAPI.getUTF8Text();
 //                Log.i("hgfhgfhfghfg", "run: text " + System.currentTimeMillis() + text);
 
             tessBaseAPI.end();
@@ -145,7 +140,7 @@ public class OCRImageUtil {
         for (Bitmap bitmap : bitmaps) {
             //把原图缩放成我们需要的图片大小
             Bitmap bm = Bitmap.createScaledBitmap(bitmap, dims[1], dims[2], false);
-            inputMat = getMatFloat(bm);
+            float[][][][] inputMat = getMatFloat(bm);
             tfLite.run(inputMat, out);
             float max = 0;
             int cnt = 0;
@@ -157,7 +152,7 @@ public class OCRImageUtil {
                 }
                 cnt++;
             }
-            if(max >= 0.5f)
+            if (max >= 0.5f)
                 strBuffer.append(labels[d]);
             else
                 strBuffer.append(' ');
@@ -174,10 +169,8 @@ public class OCRImageUtil {
      * @param uri of image we choose
      */
     public void proSrc2Gray(ContentResolver contentResolver, Uri uri) {
-        Mat rgbMat = new Mat();
-        Mat grayMat = new Mat();
+        Mat grayMat;
         Mat bin = new Mat();
-        Bitmap srcBitmap;
         try {
             grayMat = Imgcodecs.imread(uri.getPath(), Imgcodecs.IMREAD_GRAYSCALE);
 //            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri).setDensity(MediaStore.EXTRA_OUTPUT);
@@ -191,7 +184,7 @@ public class OCRImageUtil {
             // 利用OTSU二值化，将文本行与背景分割
             Imgproc.threshold(grayMat, bin, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
             //通过形态学腐蚀，将分割出来的文字字符连接在一起
-            Mat rec = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, 20), new Point(-1,-1));
+            Mat rec = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, 20), new Point(-1, -1));
             Mat dilate = new Mat();
             Imgproc.erode(bin, dilate, rec);
             Mat erode = new Mat();
@@ -211,8 +204,8 @@ public class OCRImageUtil {
                     continue;
                 Rect cntRect = Imgproc.boundingRect(matOfPoint);
                 int index;
-                for (index = 0;  index < axisX.size(); index ++) {
-                    if(axisX.get(index).x > cntRect.x){
+                for (index = 0; index < axisX.size(); index++) {
+                    if (axisX.get(index).x > cntRect.x) {
                         break;
                     }
                 }
@@ -222,7 +215,7 @@ public class OCRImageUtil {
             for (Rect x : axisX) {
                 int index;
                 for (index = 0; index < axisY.size(); index++) {
-                    if(axisY.get(index).y > x.y + 10 ) {
+                    if (axisY.get(index).y > x.y + 10) {
                         break;
                     }
                 }
@@ -236,17 +229,17 @@ public class OCRImageUtil {
                 resize(mat, mat, new Size(30, 30));
                 Bitmap bm = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888);
                 Core.bitwise_not(mat, mat);
-                if ((mat.width()/2) > bitmapMax) {
+                if ((mat.width() / 2) > bitmapMax) {
                     bitmapMax = mat.width() / 2;
                 }
-                if(mat.width() > bitmapMax && mat.height() > bitmapMax) {
+                if (mat.width() > bitmapMax && mat.height() > bitmapMax) {
                     Imgproc.filter2D(mat,
                             mat,
                             -1,
                             kernel,
                             new Point(-1, -1),
                             Core.BORDER_CONSTANT
-                            );
+                    );
                     Utils.matToBitmap(mat, bm);
                     rectangle(grayMat, rect, new Scalar(34, 25, 25, 33), 1);
                     bitmaps.add(bm);
@@ -263,6 +256,7 @@ public class OCRImageUtil {
 
     /**
      * 将 Mat 转换为 float[][][][]数组（输入格式）
+     *
      * @return 返回数组
      */
     private float[][][][] getMatFloat(Bitmap bm) {
@@ -292,14 +286,13 @@ public class OCRImageUtil {
         InputStream ins = mContext.getAssets().open("labels.txt");
         InputStreamReader reader = new InputStreamReader(ins, "GBK");
         BufferedReader bufferedReader = new BufferedReader(reader);
-        String line = " ";
-        int i=0;
+        String line;
+        int i = 0;
         while ((line = bufferedReader.readLine()) != null) {
-            line.replace(",","");
+            //noinspection ResultOfMethodCallIgnored
+            line.replace(",", "");
             for (int j = 0; j < line.length(); j++) {
-                if (Character.isDigit(line.charAt(j))) {
-                    continue;
-                } else {
+                if (!Character.isDigit(line.charAt(j))) {
                     labels[i] = line.charAt(j);
                 }
             }
@@ -309,16 +302,17 @@ public class OCRImageUtil {
 
     /**
      * 图形矫正
+     *
      * @param mat 传入灰度图 Mat
      * @return 返回矫正后的图片
      */
     public Mat houghLines(Mat mat) {
         Mat backup = mat.clone();
         Mat lines = new Mat();
-        Imgproc.Canny(mat, lines, 100 ,200, 3);
-        Imgproc.HoughLines(lines, lines, 1, Math.PI/180.0, 200, 0, 0);
+        Imgproc.Canny(mat, lines, 100, 200, 3);
+        Imgproc.HoughLines(lines, lines, 1, Math.PI / 180.0, 200, 0, 0);
         double sum = 0;
-        double angle=0;
+        double angle;
         for (int x = 0; x < lines.rows(); x++) {
             double[] vec = lines.get(x, 0);
 
@@ -343,11 +337,11 @@ public class OCRImageUtil {
         }
 
         double average = sum / lines.rows(); //对所有角度求平均，这样做旋转效果会更好
-        angle = average/ Math.PI * 180 - 90;
-        System.out.println("average:"+angle);
-        Point center=new Point();
-        center.x=mat.cols()/2;
-        center.y=mat.rows()/2;
+        angle = average / Math.PI * 180 - 90;
+        System.out.println("average:" + angle);
+        Point center = new Point();
+        center.x = mat.cols() / 2.0;
+        center.y = mat.rows() / 2.0;
 
 // 得到旋转矩阵算子
         Mat matrix = Imgproc.getRotationMatrix2D(center, angle, 1);

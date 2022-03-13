@@ -262,6 +262,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            /*
+                            在此做个等待界面
+                            ·············
+                             */
                             if (startSelect == -1) {
                                 etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
                             } else {
