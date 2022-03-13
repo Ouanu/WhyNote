@@ -3,7 +3,7 @@
 
 *数据库：ROOM*
 
-*富文本控件库：OEditTextView （来源于我自己）*
+*富文本控件库：OEditTextView （ https://github.com/Ouanu/OEditTextView ）*
 
 *使用方法：*
   `dependencies {
@@ -14,5 +14,5 @@
 1. 完成UI设计，以及基础的文件增删改查导出功能。
 2. 支持部分Markdown文本格式；
 3. 完成上传文件同步功能；
-4. 完成文字识别功能（基于卷积神经网络 by me）；
-5. 文字识别功能采用传统方式实现，并未取得进展············
+4. 完成文字识别功能（ https://github.com/Ouanu/OCR ）；
+5. 集成文字检测和识别功能，精度有待提高。
