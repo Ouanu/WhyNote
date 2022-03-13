@@ -105,11 +105,11 @@ public class ResFragment extends Fragment implements View.OnClickListener {
 //            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 //                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
 //            connectFragment.show(manager, "NULL");
-            try {
-                OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/添加Vitamio插件变成万能播放器.jpg"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.parse("file:///sdcard/Android/data/com.moment.whynote/files/Documents/添加Vitamio插件变成万能播放器.jpg"));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
         }
     }

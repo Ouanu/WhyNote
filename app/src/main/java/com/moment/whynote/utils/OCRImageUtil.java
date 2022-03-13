@@ -112,28 +112,28 @@ public class OCRImageUtil {
      * @param contentResolver 获取内容解析者
      * @param uri 获取文件链接
      */
-    public void execute(ContentResolver contentResolver, Uri uri) {
-        new Thread(() -> {
-//            proSrc2Gray(contentResolver, uri);
-//            ocr();
-            Bitmap bitmap = null;
-            try {
-                bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.text2);
-                TessBaseAPI tessBaseAPI = new TessBaseAPI();
-//                InputStream open = mContext.getAssets().open("chi_sim.trainedata");
+    public String execute(ContentResolver contentResolver, Uri uri) {
+        Bitmap bitmap = null;
+        String text = "";
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            TessBaseAPI tessBaseAPI = new TessBaseAPI();
+            tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "chi_sim");
+            tessBaseAPI.setImage(bitmap);
+            text= tessBaseAPI.getUTF8Text();
+//                Log.i("hgfhgfhfghfg", "run: text " + System.currentTimeMillis() + text);
 
-//                String DEFAULT_LANGUAGE = "chi_sim";
-                tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "chi_sim");
-                tessBaseAPI.setImage(bitmap);
-                String text = tessBaseAPI.getUTF8Text();
-                Log.i("hgfhgfhfghfg", "run: text " + System.currentTimeMillis() + text);
-
-                tessBaseAPI.end();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }).start();
+            tessBaseAPI.end();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        new Thread(() -> {
+////            proSrc2Gray(contentResolver, uri);
+////            ocr();
+//
+//
+//        }).start();
+        return text;
     }
 
     /**

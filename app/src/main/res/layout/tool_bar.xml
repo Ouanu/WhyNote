@@ -59,4 +59,13 @@
         android:scaleType="center"
         android:contentDescription="@string/add_picture" />
 
+    <ImageView
+        android:id="@+id/btn_ocr"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/ic_ocr_text"
+        android:scaleType="center"
+        android:text="OCR"/>
+
 </LinearLayout>

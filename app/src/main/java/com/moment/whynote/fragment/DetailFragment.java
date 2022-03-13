@@ -34,6 +34,7 @@ import com.moment.oetlib.view.tools.OToolItem;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.utils.OCRImageUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,11 +62,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private TextView addTitle;
     private ImageView addList;
     private ImageView btnGetUri;
+    private ImageView btnOCR;
     private static int startSelect;
 
     private Bitmap bitmap;
     private String DcimPath = "";
     private boolean chosingPic = false;
+    private boolean isOCR = false;
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -125,12 +128,14 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         addTitle = view.findViewById(R.id.add_title);
         addList = view.findViewById(R.id.add_list);
         btnGetUri = view.findViewById(R.id.btn_get_uri);
+        btnOCR = view.findViewById(R.id.btn_ocr);
 
         bold.setOnClickListener(this);
         italic.setOnClickListener(this);
         addTitle.setOnClickListener(this);
         addList.setOnClickListener(this);
         btnGetUri.setOnClickListener(this);
+        btnOCR.setOnClickListener(this);
 
 //        DcimPath = getContext().getApplicationContext().getFilesDir().getAbsolutePath() + "/DCIM";
 
@@ -193,6 +198,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 startSelect = etDesc.getEditText().getSelectionStart();
                 mGetContent.launch("image/*");
                 chosingPic = true;
+                isOCR = false;
+                break;
+            case R.id.btn_ocr:
+                startSelect = etDesc.getEditText().getSelectionStart();
+                mGetContent.launch("image/*");
+                chosingPic = true;
+                isOCR = true;
             default:
                 break;
         }
@@ -236,17 +248,39 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    if (startSelect == -1) {
-                        etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
+                    if (!isOCR) {
+                        if (startSelect == -1) {
+                            etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
+                        } else {
+                            etDesc.getEditText().getText().insert(startSelect, "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
+                        }
                     } else {
-                        etDesc.getEditText().getText().insert(startSelect, "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
+                        new Thread(()->{
+                            String text = null;
+                            try {
+                                text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.fromFile(saveFile));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            if (startSelect == -1) {
+                                etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
+                            } else {
+                                etDesc.getEditText().getText().insert(startSelect, text);
+                            }
+                        }).start();
+
+
                     }
+
 //                    etDesc.getEditText().getOTools().addToolItem(new OPictureTool(etDesc.getEditText(), getContext()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
                     chosingPic = false;
+                    isOCR = false;
                 }
             }
     );
+
+
 }
