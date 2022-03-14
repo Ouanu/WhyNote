@@ -1,6 +1,5 @@
 package com.moment.whynote.fragment;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -24,11 +23,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.oetlib.view.OEditTextView;
@@ -46,6 +43,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.Executors;
 
 
 @SuppressWarnings("ALL")
@@ -69,13 +67,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     private ImageView addList;
     private ImageView btnGetUri;
     private ImageView btnOCR;
-    private static int startSelect;
-
     private Bitmap bitmap;
     private String DcimPath = "";
+    private static int startSelect;
     private boolean chosingPic = false;
     private boolean isOCR = false;
     private String text = "";
+    private WaitingFragment waitingFragment = new WaitingFragment();
 
 
     public interface WaitForOCR {
@@ -252,6 +250,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
             if (msg.what == DATA_IS_READY) {
                 applyTools();
             } else if(msg.what == OCR_IS_DONE) {
+                waitingFragment.dismiss();
                 if (startSelect == -1) {
                     etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
                 } else {
@@ -290,9 +289,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
 
                 } else {
                     isOCR = false;
-                    WaitingFragment waitingFragment = new WaitingFragment();
                     getParentFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom).show(waitingFragment);
+                            .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
+                    waitingFragment.show(getParentFragmentManager(), null);
                     new Thread(()->{
                         try {
                             text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
@@ -301,11 +300,13 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
                         }
                         handler.sendEmptyMessage(OCR_IS_DONE);
                     }).start();
-//                        callback.waitingOCR(true);
 
                 }
             }
+
     );
 
+
+    private Thread workThread = new Thread();
 
 }
