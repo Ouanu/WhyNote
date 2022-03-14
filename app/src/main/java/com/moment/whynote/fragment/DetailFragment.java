@@ -24,7 +24,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.moment.oetlib.view.OEditTextView;
@@ -45,9 +49,11 @@ import java.util.Objects;
 
 
 @SuppressWarnings("ALL")
-public class DetailFragment extends Fragment implements View.OnClickListener {
+public class DetailFragment extends Fragment implements View.OnClickListener, LifecycleObserver {
 
 
+    private static final int OCR_IS_DONE = 1001;
+    private static final int DATA_IS_READY = 1000;
     private EditText etTitle;
     private OEditTextView etDesc;
     private OToolBarView toolbar;
@@ -69,6 +75,20 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private String DcimPath = "";
     private boolean chosingPic = false;
     private boolean isOCR = false;
+    private String text = "";
+
+
+    public interface WaitForOCR {
+        void waitingOCR(Boolean result);
+    }
+
+    private WaitForOCR callback;
+
+    @Override
+    public void onAttach(@NonNull @NotNull Context context) {
+        super.onAttach(context);
+        callback = (WaitForOCR)context;
+    }
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -86,7 +106,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         etDesc = view.findViewById(R.id.et_desc);
         toolbar = view.findViewById(R.id.toolbar);
         etDesc.getEditText().setBackgroundColor(0);
-        handler = new DetailHandler();
+        handler = new DetailHandler(Looper.getMainLooper());
         new Thread(() -> {
             assert bundle != null;
             if (bundle.getInt("primaryKey") == 0) {
@@ -96,7 +116,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             }
             etTitle.setText(data.title);
             etDesc.getEditText().setText(data.desc);
-            handler.sendEmptyMessage(20000);
+            handler.sendEmptyMessage(DATA_IS_READY);
         }).start();
         etDesc.getEditText().getOTools().autoTool();
         etDesc.getEditText().getOTools().addToolItem(new OPictureTool(etDesc.getEditText(), getContext()));
@@ -211,19 +231,32 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    /*
+    加载工具
+     */
     private void applyTools() {
         for (OToolItem oToolItem : etDesc.getEditText().getOTools().getToolList()) {
             oToolItem.applyOMDTool();
         }
     }
 
-    @SuppressLint("all")
     private class DetailHandler extends Handler {
+
+        public DetailHandler(@NonNull @NotNull Looper looper) {
+            super(looper);
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
 //            super.handleMessage(msg);
-            if (msg.what == 20000) {
+            if (msg.what == DATA_IS_READY) {
                 applyTools();
+            } else if(msg.what == OCR_IS_DONE) {
+                if (startSelect == -1) {
+                    etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
+                } else {
+                    etDesc.getEditText().getText().insert(startSelect, text);
+                }
             }
         }
     }
@@ -233,11 +266,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private final ActivityResultLauncher<String> mGetContent = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
             result -> {
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), result);
-                    File saveFile = new File(DcimPath, System.currentTimeMillis() + ".jpg");
-
+                if (!isOCR) {
                     try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), result);
+                        File saveFile = new File(DcimPath, System.currentTimeMillis() + ".jpg");
                         FileOutputStream saveImgOut = new FileOutputStream(saveFile);
                         // compress - 压缩的意思
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, saveImgOut);
@@ -245,43 +277,32 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                         saveImgOut.flush();
                         saveImgOut.close();
                         Log.d("Save Bitmap", "The picture is save to your phone!");
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    if (!isOCR) {
                         if (startSelect == -1) {
                             etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
                         } else {
                             etDesc.getEditText().getText().insert(startSelect, "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
                         }
-                    } else {
-                        new Thread(()->{
-                            String text = null;
-                            try {
-                                text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), Uri.fromFile(saveFile));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            /*
-                            在此做个等待界面
-                            ·············
-                             */
-                            if (startSelect == -1) {
-                                etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
-                            } else {
-                                etDesc.getEditText().getText().insert(startSelect, text);
-                            }
-                        }).start();
-
-
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        chosingPic = false;
                     }
 
-//                    etDesc.getEditText().getOTools().addToolItem(new OPictureTool(etDesc.getEditText(), getContext()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    chosingPic = false;
+                } else {
                     isOCR = false;
+                    WaitingFragment waitingFragment = new WaitingFragment();
+                    getParentFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom).show(waitingFragment);
+                    new Thread(()->{
+                        try {
+                            text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        handler.sendEmptyMessage(OCR_IS_DONE);
+                    }).start();
+//                        callback.waitingOCR(true);
+
                 }
             }
     );

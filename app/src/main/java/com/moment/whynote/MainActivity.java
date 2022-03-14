@@ -22,6 +22,7 @@ import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.fragment.ConnectFragment;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
+import com.moment.whynote.fragment.WaitingFragment;
 import com.moment.whynote.service.ControlService;
 import com.moment.whynote.utils.OCRImageUtil;
 
@@ -32,7 +33,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener {
+public class MainActivity extends AppCompatActivity implements ResFragment.ResListener, ConnectFragment.ConnectListener, DetailFragment.WaitForOCR {
 
     //    private ResRepository repository;
     public static MainHandler handler;
@@ -161,6 +162,11 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
 //
 //        }
 
+
+    }
+
+    @Override
+    public void waitingOCR(Boolean result) {
 
     }
 
