@@ -43,7 +43,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 @SuppressWarnings("ALL")
@@ -105,17 +108,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
         toolbar = view.findViewById(R.id.toolbar);
         etDesc.getEditText().setBackgroundColor(0);
         handler = new DetailHandler(Looper.getMainLooper());
-        new Thread(() -> {
-            assert bundle != null;
-            if (bundle.getInt("primaryKey") == 0) {
-                data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
-            } else {
-                data = repository.getResDataByUid(bundle.getInt("primaryKey"));
-            }
-            etTitle.setText(data.title);
-            etDesc.getEditText().setText(data.desc);
-            handler.sendEmptyMessage(DATA_IS_READY);
-        }).start();
+        executor.execute(new LoadDataTask(bundle));
         etDesc.getEditText().getOTools().autoTool();
         etDesc.getEditText().getOTools().addToolItem(new OPictureTool(etDesc.getEditText(), getContext()));
 
@@ -163,17 +156,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     @Override
     public void onStop() {
         super.onStop();
-        new Thread(() -> {
-            Looper.prepare();
-            data.title = String.valueOf(etTitle.getText());
-            data.desc = String.valueOf(etDesc.getEditText().getText());
-            if (data.title.equals("") && data.desc.equals("") && !chosingPic) {
-                repository.deleteResData(data);
-            } else {
-                repository.upResData(data);
-            }
-            Looper.loop();
-        }).start();
+        executor.execute(new SaveDataTask());
     }
 
     @Override
@@ -292,21 +275,93 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
                     getParentFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
                     waitingFragment.show(getParentFragmentManager(), null);
-                    new Thread(()->{
-                        try {
-                            text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        handler.sendEmptyMessage(OCR_IS_DONE);
-                    }).start();
-
+                    executor.execute(new OCRTask(result));
                 }
             }
 
     );
 
 
-    private Thread workThread = new Thread();
+    /**
+     * 线程池
+     */
+    private static Executor executor = new ThreadPoolExecutor(
+            2,
+            4,
+            10,
+            TimeUnit.MILLISECONDS,
+            new SynchronousQueue<Runnable>(),
+            new ThreadPoolExecutor.AbortPolicy());
 
+
+    /**
+     * 加载数据
+     */
+    private class LoadDataTask implements Runnable {
+
+        private Bundle bundle;
+
+        public LoadDataTask(Bundle bundle) {
+            this.bundle = bundle;
+        }
+
+        @Override
+        public void run() {
+            assert bundle != null;
+            if (bundle.getInt("primaryKey") == 0) {
+                data = repository.getResDataByUpdateDate(bundle.getLong("updateDate"));
+            } else {
+                data = repository.getResDataByUid(bundle.getInt("primaryKey"));
+            }
+            etTitle.setText(data.title);
+            etDesc.getEditText().setText(data.desc);
+            handler.sendEmptyMessage(DATA_IS_READY);
+        }
+    }
+
+    /**
+     * 保存数据
+     */
+    private class SaveDataTask implements Runnable {
+
+        @Override
+        public void run() {
+            data.title = String.valueOf(etTitle.getText());
+            data.desc = String.valueOf(etDesc.getEditText().getText());
+            if (data.title.equals("") && data.desc.equals("") && !chosingPic) {
+                repository.deleteResData(data);
+            } else {
+                repository.upResData(data);
+            }
+        }
+    }
+
+
+    /**
+     * OCR获取结果
+     */
+    private class OCRTask implements Runnable {
+
+        private Uri result;
+
+        public OCRTask(Uri result) {
+            this.result = result;
+        }
+
+        @Override
+        public void run() {
+            try {
+                text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            handler.sendEmptyMessage(OCR_IS_DONE);
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }
