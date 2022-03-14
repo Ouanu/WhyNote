@@ -78,17 +78,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     private String text = "";
     private WaitingFragment waitingFragment = new WaitingFragment();
 
-
-    public interface WaitForOCR {
-        void waitingOCR(Boolean result);
-    }
-
-    private WaitForOCR callback;
-
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
-        callback = (WaitForOCR)context;
     }
 
     @Nullable
