@@ -16,7 +16,6 @@ import androidx.fragment.app.FragmentTransaction;
 import com.moment.whynote.fragment.ConnectFragment;
 import com.moment.whynote.fragment.DetailFragment;
 import com.moment.whynote.fragment.ResFragment;
-import com.moment.whynote.service.ControlService;
 
 
 import java.io.File;
@@ -98,13 +97,13 @@ public class MainActivity extends AppCompatActivity implements ResFragment.ResLi
 
     @Override
     public void onConnectSelected(Bundle bundle) {
-        if (bundle.getString("command").equals("start")) {
-            Intent start = new Intent(this, ControlService.class);
-            start.putExtra("ip", bundle.getString("ip"));
-            start.putExtra("port", bundle.getInt("port"));
-            start.putExtra("updateTime", bundle.getString("updateTime"));
-            startService(start);
-        }
+//        if (bundle.getString("command").equals("start")) {
+//            Intent start = new Intent(this, ControlService.class);
+//            start.putExtra("ip", bundle.getString("ip"));
+//            start.putExtra("port", bundle.getInt("port"));
+//            start.putExtra("updateTime", bundle.getString("updateTime"));
+//            startService(start);
+//        }
 //         else if (bundle.getString("command").equals("finish")) {
 //
 //        }

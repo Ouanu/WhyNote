@@ -29,4 +29,7 @@ public class ResData {
     @ColumnInfo(name = "dirPath")
     public String dirPath= "";
 
+    @ColumnInfo(name = "dirName")
+    public String dirName= "";
+
 }

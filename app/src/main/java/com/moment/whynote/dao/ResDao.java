@@ -32,6 +32,9 @@ public interface ResDao {
     @Update
     void updateResData(ResData data);
 
+    @Query("SELECT dirName FROM resdata WHERE uid = :id")
+    String getDirName(int id);
+
 
 
 }

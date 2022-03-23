@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import android.provider.MediaStore;
@@ -113,7 +114,7 @@ public class OCRImageUtil {
         try {
             bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
             TessBaseAPI tessBaseAPI = new TessBaseAPI();
-            tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "chi_sim");
+            tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "myocr");
             tessBaseAPI.setImage(bitmap);
             text = tessBaseAPI.getUTF8Text();
 //                Log.i("hgfhgfhfghfg", "run: text " + System.currentTimeMillis() + text);
@@ -123,8 +124,8 @@ public class OCRImageUtil {
             e.printStackTrace();
         }
 //        new Thread(() -> {
-////            proSrc2Gray(contentResolver, uri);
-////            ocr();
+//            proSrc2Gray(contentResolver, uri);
+//            text = ocr();
 //
 //
 //        }).start();
@@ -135,7 +136,7 @@ public class OCRImageUtil {
      * OCR识别
      * 获取精度最高的标签
      */
-    private void ocr() {
+    private String ocr() {
 
         for (Bitmap bitmap : bitmaps) {
             //把原图缩放成我们需要的图片大小
@@ -152,14 +153,14 @@ public class OCRImageUtil {
                 }
                 cnt++;
             }
-            if (max >= 0.5f)
+            if (max >= 0.7f)
                 strBuffer.append(labels[d]);
             else
                 strBuffer.append(' ');
         }
 
-        System.out.println(strBuffer.toString());
-
+//        System.out.println(strBuffer.toString());
+        return strBuffer.toString();
 
     }
 
@@ -169,17 +170,20 @@ public class OCRImageUtil {
      * @param uri of image we choose
      */
     public void proSrc2Gray(ContentResolver contentResolver, Uri uri) {
-        Mat grayMat;
+        Mat grayMat = new Mat();
+        Bitmap srcBitmap;
         Mat bin = new Mat();
+        Mat rgbMat = new Mat();
         try {
-            grayMat = Imgcodecs.imread(uri.getPath(), Imgcodecs.IMREAD_GRAYSCALE);
-//            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri).setDensity(MediaStore.EXTRA_OUTPUT);
+//            grayMat = Imgcodecs.imread(uri.getPath(), Imgcodecs.IMREAD_GRAYSCALE);
+            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            Utils.bitmapToMat(srcBitmap,rgbMat);
 //            srcBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri));
 //            System.out.println(srcBitmap.getWidth() + " "+ srcBitmap.getHeight() + ";;; " + src2Bitmap.getWidth() + " "+ src2Bitmap.getHeight());
 
             //对图片进行灰度化
 //            Utils.bitmapToMat(srcBitmap, rgbMat);
-//            Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
+            Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
             grayMat = houghLines(grayMat);
             // 利用OTSU二值化，将文本行与背景分割
             Imgproc.threshold(grayMat, bin, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
@@ -335,7 +339,6 @@ public class OCRImageUtil {
             sum += theta;
             Imgproc.line(mat, pt1, pt2, new Scalar(0, 0, 255), 1, Imgproc.LINE_4, 0);
         }
-
         double average = sum / lines.rows(); //对所有角度求平均，这样做旋转效果会更好
         angle = average / Math.PI * 180 - 90;
         System.out.println("average:" + angle);

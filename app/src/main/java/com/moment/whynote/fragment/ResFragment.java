@@ -65,6 +65,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();
                 newData.dirPath = file.getAbsolutePath();
+                newData.dirName = String.valueOf(newData.updateDate);
                 repository.insertData(newData);
                 Bundle bundle = new Bundle();
                 bundle.putInt("primaryKey", newData.uid);

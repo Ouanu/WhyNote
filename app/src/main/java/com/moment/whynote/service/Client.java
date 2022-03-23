@@ -1,188 +1,95 @@
 package com.moment.whynote.service;
 
-import android.annotation.SuppressLint;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import com.moment.whynote.data.ResData;
+import com.moment.whynote.database.ResRepository;
+
+import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.HashMap;
+
 
 public class Client {
-    private static volatile Client instance;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private OutputStream os;
-    private InputStream is;
-    private final Queue<File> fileQueue = new LinkedList<>();
 
-    public static Client getInstance() {
-        if (instance == null) {
-            synchronized (Client.class) {
-                if (instance == null) {
-                    instance = new Client();
-                }
-            }
-        }
-        return instance;
-    }
+    private int port = 9250;
+    private String address = "192.168.137.1";
+    private Socket socket;
+    private ResRepository repository = ResRepository.getInstance();
 
     public Client() {
-
-    }
-
-    public void insertFiles(String path) {
-        File file = new File(path);
-        File[] files = file.listFiles();
-        assert null != files;
-        fileQueue.addAll(Arrays.asList(files));
-    }
-
-    public void upload() {
         try {
-            dos.writeInt(fileQueue.size());
-            int cnt = 3;
-            while (null != fileQueue.peek()) {
-                try {
-                    // send file's name
-                    System.out.println(Objects.requireNonNull(fileQueue.peek()).getName());
-                    dos.writeUTF(Objects.requireNonNull(fileQueue.peek()).getName());
-                    // get the message from server
-                    FileInputStream fis = new FileInputStream(Objects.requireNonNull(fileQueue.peek()).getAbsolutePath());
-                    dos.writeInt(fis.available());
-                    os.flush();
-                    byte[] bytes;
-                    int size;
-                    while (true) {
-                        bytes = new byte[1024];
-                        size = fis.read(bytes);
-                        if (size == -1) {
-                            break;
-                        }
-                        dos.writeInt(size);
-                        os.write(bytes);
-                        dis.readUTF();
-                        os.flush();
+            socket = new Socket(address, port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void execute() throws IOException {
+        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+        DirAndFileUtil util = new DirAndFileUtil(2);
+        HashMap<Long, ResData> idList = new HashMap<>();
+        for (int i = 0; i < repository.getAllResData().getValue().size(); i++) {
+            idList.put(Long.valueOf(repository.getAllResData().getValue().get(i).uid), repository.getAllResData().getValue().get(i));
+        }
+
+
+        if (socket.isConnected()) {
+            outputStream.writeUTF("Hello there!!");
+            String s = inputStream.readUTF();
+            System.out.println(s);
+            outputStream.writeInt(34567);
+            s = inputStream.readUTF();
+            System.out.println(s);
+
+        }
+
+
+        if (inputStream.readLong() == 1000l) {
+            System.out.println("有数据库");
+            boolean isChange = false;
+            outputStream.writeInt(idList.size());
+            for (Long aLong : idList.keySet()) {
+                outputStream.writeLong(aLong);
+                outputStream.writeLong(idList.get(aLong).updateDate);
+                if (inputStream.readBoolean()) {
+                    outputStream.writeUTF(idList.get(aLong).dirName);
+                    if (inputStream.readUTF().equals("文件夹创建失败")) {
+                        continue;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    /*
-                      失败重传，少于三次
-                     */
-                    if (cnt > 0) {
-                        fileQueue.add(fileQueue.peek());
-                        cnt--;
+                    File dir = new File("C:\\Users\\Linkdamo\\Desktop\\client\\" + idList.get(aLong).dirName);
+                    String[] list = dir.list();
+                    outputStream.writeInt(list.length);
+                    for (File file : dir.listFiles()) {
+                        util.sendFiles(outputStream, file);
                     }
-                } finally {
-                    fileQueue.poll();
+                    isChange = true;
+                } else {
+                    continue;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    upload folders first, then files
-     */
-    public void uploadFolder(File[] folder) {
-        try {
-//            dos.writeUTF("#1F33d8k#");
-            dos.writeInt(folder.length);
-            for (File f : folder) {
-                dos.writeUTF(f.getName());
-                System.out.println(dis.readUTF());
-                insertFiles(f.getAbsolutePath());
-                upload();
+            if (isChange) {
+                System.out.println("数据库需要更新");
+                System.out.println(inputStream.readUTF());
+                File sql = new File("C:\\Users\\Linkdamo\\Desktop\\client\\database\\RES_DATABASE.db");
+                util.sendFiles(outputStream, sql);
+            } else {
+                System.out.println("数据库不需要更新");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } else {
+            util.synchronizeFiles(inputStream, outputStream);
+            System.out.println(inputStream.readUTF());
         }
+
+
+
+//        util.downloadFiles(outputStream, inputStream);
+        outputStream.writeUTF("BYE");
+        outputStream.close();
+        inputStream.close();
+        socket.close();
     }
 
-    public void synchroServerData() {
-        downloadFolders();
-    }
-
-
-    public void executeTask(Socket socket) {
-        try {
-            dis = new DataInputStream(socket.getInputStream());
-            dos = new DataOutputStream(socket.getOutputStream());
-            is = socket.getInputStream();
-            os = socket.getOutputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    创建文件夹
-     */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void downloadFolders() {
-        try {
-            int size = dis.readInt();
-            System.out.println(size);
-            while (size > 0) {
-                @SuppressLint("SdCardPath")
-                File folder = new File("/sdcard/Android/data/com.moment.whynote/files/Documents", dis.readUTF());
-                if (!folder.exists()) {
-                    folder.mkdirs();
-                }
-                dos.writeUTF(folder.getName() + "已创建");
-                downloadFiles(folder);
-                size--;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    下载文件夹中的所有文件
-     */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void downloadFiles(File folder) {
-        try {
-            int sizeOfFiles = dis.readInt();
-            while (sizeOfFiles > 0) {
-                File file = new File(folder, dis.readUTF());
-                FileOutputStream fos = new FileOutputStream(file);
-                int size = dis.readInt();
-                byte[] bytes;
-                while (size > 0) {
-                    size -= dis.readInt();
-                    bytes = new byte[1024];
-                    is.read(bytes);
-                    fos.write(bytes);
-                    dos.writeUTF("N");
-                }
-                fos.close();
-                dos.flush();
-                sizeOfFiles--;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-//    public static void main(String[] args) {
-//        Client client = getInstance();
-//        try {
-//            Socket socket = new Socket(address, port);
-//            client.executeTask(socket);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }
