@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WhyNote">
-
+        <service android:name=".service.ControlService"/>
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">

@@ -2,12 +2,26 @@ package com.moment.whynote.service;
 
 
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
+
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.viewmodel.ResViewModel;
+
+import org.checkerframework.checker.units.qual.C;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class Client {
@@ -16,22 +30,41 @@ public class Client {
     private String address = "192.168.137.1";
     private Socket socket;
     private ResRepository repository = ResRepository.getInstance();
+    private static volatile Client instance = null;
+    private List<ResData> resDataList;
 
     public Client() {
         try {
             socket = new Socket(address, port);
+            Log.i("Client", "Client: socket=============");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void execute() throws IOException {
+    public static Client getInstance() {
+        if (instance == null) {
+            synchronized (Client.class) {
+                if (instance == null) {
+                    return new Client();
+                }
+            }
+        }
+        return instance;
+    }
+
+
+    public void execute(List<ResData> resDataList) throws IOException {
+        if (socket == null || !socket.isConnected()) {
+            return;
+        }
         DataInputStream inputStream = new DataInputStream(socket.getInputStream());
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
         DirAndFileUtil util = new DirAndFileUtil(2);
         HashMap<Long, ResData> idList = new HashMap<>();
-        for (int i = 0; i < repository.getAllResData().getValue().size(); i++) {
-            idList.put(Long.valueOf(repository.getAllResData().getValue().get(i).uid), repository.getAllResData().getValue().get(i));
+        Log.e("CLIENT", "execute:====== " + resDataList.get(0).uid);
+        for (int i = 0; i < resDataList.size(); i++) {
+            idList.put((long) resDataList.get(i).uid, resDataList.get(i));
         }
 
 
@@ -58,7 +91,7 @@ public class Client {
                     if (inputStream.readUTF().equals("文件夹创建失败")) {
                         continue;
                     }
-                    File dir = new File("C:\\Users\\Linkdamo\\Desktop\\client\\" + idList.get(aLong).dirName);
+                    File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/" + idList.get(aLong).dirName);
                     String[] list = dir.list();
                     outputStream.writeInt(list.length);
                     for (File file : dir.listFiles()) {
@@ -72,7 +105,7 @@ public class Client {
             if (isChange) {
                 System.out.println("数据库需要更新");
                 System.out.println(inputStream.readUTF());
-                File sql = new File("C:\\Users\\Linkdamo\\Desktop\\client\\database\\RES_DATABASE.db");
+                File sql = new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db");
                 util.sendFiles(outputStream, sql);
             } else {
                 System.out.println("数据库不需要更新");
@@ -80,6 +113,17 @@ public class Client {
 
         } else {
             util.synchronizeFiles(inputStream, outputStream);
+            File sqlDir = new File("/data/data/com.moment.whynote/databases/");
+            outputStream.writeInt(sqlDir.listFiles().length);
+
+            if (sqlDir.exists()) {
+                File[] sqlFiles = sqlDir.listFiles();
+                for (File file : sqlFiles) {
+//                    File sql = new File("/data/data/com.moment.whynote/databases/");
+                    Log.d("Client", "execute: " + file.getName());;
+                    util.sendFiles(outputStream, file);
+                }
+            }
             System.out.println(inputStream.readUTF());
         }
 

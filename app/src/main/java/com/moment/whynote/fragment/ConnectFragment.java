@@ -1,6 +1,7 @@
 package com.moment.whynote.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,11 +12,19 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.moment.whynote.R;
+import com.moment.whynote.data.ResData;
+import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -29,24 +38,31 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     private static final String TAG = "ConnectFragment";
     private EditText etIpAddress;
     private EditText etPort;
-
-    public interface ConnectListener {
-        void onConnectSelected(Bundle bundle);
-    }
-
-    private static ConnectListener connectCallback;
+    private ResRepository repository = ResRepository.getInstance();
+    private List<ResData> resDataList;
 
 
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
-        connectCallback = (ConnectListener) context;
     }
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        repository.getAllResData().observe(getViewLifecycleOwner(), new Observer<List<ResData>>() {
+            @Override
+            public void onChanged(List<ResData> resData) {
+                resDataList = resData;
+                Log.d(TAG, "onCreate: ++++++++++++" + resDataList.size());
+            }
+        });
     }
 
     /**
@@ -76,14 +92,16 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     public void onClick(View v) {
         Bundle bundle = new Bundle();
         if (v.getId() == R.id.btn_connect) {
-            bundle.putString("command", "start");
-            bundle.putString("ip", etIpAddress.getText().toString());
-            bundle.putInt("port", Integer.parseInt(etPort.getText().toString()));
-            connectCallback.onConnectSelected(bundle);
+            Intent intent = new Intent(getContext(), ControlService.class);
+            ArrayList list = new ArrayList();
+            list.add(resDataList);
+            bundle.putParcelableArrayList("LIST", list);
+            intent.putExtras(bundle);
+            getContext().startService(intent);
             dismiss();
         } else if (v.getId() == R.id.btn_disconnect) {
             bundle.putString("command", "quit");
-            connectCallback.onConnectSelected(bundle);
+//            connectCallback.onConnectSelected(resDataList);
             dismiss();
         }
     }

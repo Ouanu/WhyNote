@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.moment.whynote.database.ResRepository;
+import com.moment.whynote.service.Client;
 import com.moment.whynote.utils.OCRImageUtil;
 
 import org.opencv.android.OpenCVLoader;
@@ -24,6 +25,7 @@ public class WhyNoteApplication extends Application {
         getResRepository();
         initLoadOpenCV();
         getOCRImageUtil();
+
     }
 
     /**
@@ -31,7 +33,6 @@ public class WhyNoteApplication extends Application {
      */
     private void getResRepository() {
         ResRepository repository = new ResRepository(this);
-        Log.i(TAG, "Database is ready." + repository.hashCode());
     }
 
     /**

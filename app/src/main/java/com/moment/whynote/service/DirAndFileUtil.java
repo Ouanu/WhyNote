@@ -32,7 +32,7 @@ public class DirAndFileUtil {
         HashMap<String, Integer> map = new HashMap<>();
         HashMap<String, LinkedList<File>> dirAndFiles = new HashMap<>();
         String[] dirNames = new String[0];
-        File dir = new File("C:\\Users\\Linkdamo\\Desktop\\" + NAME + "\\");
+        File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/");
         if (!dir.exists()) {
             dir.mkdirs();
         } else {

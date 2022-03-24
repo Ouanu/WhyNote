@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -33,6 +34,7 @@ import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ResFragment extends Fragment implements View.OnClickListener {
@@ -93,7 +95,8 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             editor.apply();
         } else if (v.getId() == R.id.title_2) {
             ConnectFragment connectFragment = new ConnectFragment();
-            manager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            manager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
             connectFragment.show(manager, "NULL");
 
@@ -276,9 +279,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         adapter = new ResAdapter(dataList);
         recyclerView.setAdapter(adapter);
     }
-
-
-
 
 }
 

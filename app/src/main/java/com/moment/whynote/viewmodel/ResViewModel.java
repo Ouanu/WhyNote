@@ -11,4 +11,6 @@ import java.util.List;
 public class ResViewModel extends ViewModel {
     private final ResRepository repository = ResRepository.getInstance();
     public LiveData<List<ResData>> dataList = repository.getAllResData();
+
+
 }

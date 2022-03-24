@@ -21,6 +21,7 @@ public class ResRepository {
     private final ResDao dao;
     @SuppressLint("StaticFieldLeak")
     private static Context mContext = null;
+    private ResDatabase database;
 
     /**
      * 构造函数
@@ -35,7 +36,7 @@ public class ResRepository {
         /*
           创建数据库
          */
-        ResDatabase database = Room.databaseBuilder(mContext,
+        database = Room.databaseBuilder(mContext,
                 ResDatabase.class,
                 DATABASE_NAME).build();
         /*
