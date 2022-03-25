@@ -51,7 +51,7 @@ public class ControlService extends Service{
 //        executor.execute(()->client = Client.getInstance());
         executor.execute(()->{
             try {
-                client = Client.getInstance();
+                client = new Client();
                 client.execute(resDataList);
                 Log.i(TAG, "onStartCommand: 正常运行");
 //                Toast.makeText(this, "onStartCommand: 正常运行", Toast.LENGTH_SHORT).show();
@@ -61,7 +61,7 @@ public class ControlService extends Service{
                 e.printStackTrace();
             }
         });
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Nullable

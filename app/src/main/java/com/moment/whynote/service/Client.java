@@ -79,14 +79,30 @@ public class Client {
         }
 
 
-        if (inputStream.readLong() == 1000l) {
+        if (inputStream.readLong() == 1000L) {
             System.out.println("有数据库");
             boolean isChange = false;
             outputStream.writeInt(idList.size());
             for (Long aLong : idList.keySet()) {
                 outputStream.writeLong(aLong);
                 outputStream.writeLong(idList.get(aLong).updateDate);
-                if (inputStream.readBoolean()) {
+                if (inputStream.readInt() == 999) {
+                    if (inputStream.readBoolean()) {
+                        outputStream.writeUTF(idList.get(aLong).dirName);
+                        if (inputStream.readUTF().equals("文件夹创建失败")) {
+                            continue;
+                        }
+                        File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/" + idList.get(aLong).dirName);
+                        String[] list = dir.list();
+                        outputStream.writeInt(list.length);
+                        for (File file : dir.listFiles()) {
+                            util.sendFiles(outputStream, file);
+                        }
+                        isChange = true;
+                    } else {
+                        continue;
+                    }
+                } else {
                     outputStream.writeUTF(idList.get(aLong).dirName);
                     if (inputStream.readUTF().equals("文件夹创建失败")) {
                         continue;
@@ -98,15 +114,24 @@ public class Client {
                         util.sendFiles(outputStream, file);
                     }
                     isChange = true;
-                } else {
-                    continue;
                 }
+
             }
             if (isChange) {
                 System.out.println("数据库需要更新");
                 System.out.println(inputStream.readUTF());
-                File sql = new File("/data/data/com.moment.whynote/databases/RES_DATABASE.db");
-                util.sendFiles(outputStream, sql);
+                File sqlDir = new File("/data/data/com.moment.whynote/databases/");
+                outputStream.writeInt(sqlDir.list().length);
+
+                if (sqlDir.exists()) {
+                    File[] sqlFiles = sqlDir.listFiles();
+                    for (File file : sqlFiles) {
+//                    File sql = new File("/data/data/com.moment.whynote/databases/");
+                        Log.d("Client", "execute: " + file.getName());;
+                        util.sendFiles(outputStream, file);
+                    }
+                }
+//                System.out.println(inputStream.readUTF());
             } else {
                 System.out.println("数据库不需要更新");
             }
@@ -127,10 +152,8 @@ public class Client {
             System.out.println(inputStream.readUTF());
         }
 
-
-
 //        util.downloadFiles(outputStream, inputStream);
-        outputStream.writeUTF("BYE");
+//        outputStream.writeUTF("BYE");
         outputStream.close();
         inputStream.close();
         socket.close();

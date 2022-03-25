@@ -320,6 +320,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
         public void run() {
             data.title = String.valueOf(etTitle.getText());
             data.desc = String.valueOf(etDesc.getEditText().getText());
+            data.updateDate = System.currentTimeMillis();
             if (data.title.equals("") && data.desc.equals("") && !chosingPic) {
                 repository.deleteResData(data);
             } else {

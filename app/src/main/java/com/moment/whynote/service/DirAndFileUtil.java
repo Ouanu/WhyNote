@@ -145,7 +145,7 @@ public class DirAndFileUtil {
             int fileSum = inputStream.readInt();
             System.out.println("文件数量：" + fileSum);
             for (int i = 0; i < fileSum; i++) {
-                byte[] bytes = new byte[512]; // 缓冲池
+                byte[] bytes = new byte[1024]; // 缓冲池
                 int len = inputStream.readInt(); // 文件长度
                 System.out.println("real size = " + len);
                 String fileName = inputStream.readUTF(); // 文件名称
@@ -158,6 +158,7 @@ public class DirAndFileUtil {
                     int temp = inputStream.read(bytes);
                     fileOutputStream.write(bytes);
                     len -= temp;
+                    Thread.sleep(20);
                 }
                 fileOutputStream.close(); // 关闭文件输出流，结束该文件传输
             }
@@ -175,7 +176,7 @@ send files
 //            File file = new File("C:\\Users\\Linkdamo\\Desktop\\证明2.jpg");
             if (file.exists()) {
                 System.out.println("文件存在！");
-                byte[] bytes = new byte[512];
+                byte[] bytes = new byte[1024];
                 FileInputStream fileInputStream = new FileInputStream(file);
                 BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
@@ -186,37 +187,19 @@ send files
                     int temp = bufferedInputStream.read(bytes);
                     len -= temp;
                     outputStream.write(bytes);
+                    Thread.sleep(10);
                 }
             }
             return true;
         } catch (Exception e) {
             System.out.println("Failed to send files" + e);
             return false;
-        }
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public boolean getSQL(DataInputStream inputStream) {
-        try {
-            byte[] bytes = new byte[512]; // 缓冲池
-            int len = inputStream.readInt(); // 文件长度
-            System.out.println("real size = " + len);
-            String fileName = inputStream.readUTF(); // 文件名称
-            File file = new File("C:\\Users\\Linkdamo\\Desktop\\" + NAME + "\\database\\", fileName); //保存路径
-            if (!file.exists()) {
-                file.createNewFile(); // 为接收文件创建文件
+        } finally {
+            try {
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            while (len > 0) { // 检测是否传输完成
-                int temp = inputStream.read(bytes);
-                fileOutputStream.write(bytes);
-                len -= temp;
-            }
-            fileOutputStream.close(); // 关闭文件输出流，结束该文件传输
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 }
