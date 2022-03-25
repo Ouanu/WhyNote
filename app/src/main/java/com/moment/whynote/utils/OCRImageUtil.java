@@ -117,18 +117,10 @@ public class OCRImageUtil {
             tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "myocr");
             tessBaseAPI.setImage(bitmap);
             text = tessBaseAPI.getUTF8Text();
-//                Log.i("hgfhgfhfghfg", "run: text " + System.currentTimeMillis() + text);
-
             tessBaseAPI.end();
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        new Thread(() -> {
-//            proSrc2Gray(contentResolver, uri);
-//            text = ocr();
-//
-//
-//        }).start();
         return text;
     }
 

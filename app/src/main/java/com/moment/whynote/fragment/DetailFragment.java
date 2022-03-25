@@ -176,7 +176,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
                 etDesc.getEditText().setSelection(etDesc.getEditText().getSelectionStart() - 2);
                 break;
             case R.id.add_title:
-                Objects.requireNonNull(etDesc.getEditText().getText()).insert(etDesc.getEditText().getSelectionStart(), "\n#");
+                Objects.requireNonNull(etDesc.getEditText().getText()).insert(etDesc.getEditText().getSelectionStart(), "\n# ");
                 etDesc.getEditText().setSelection(etDesc.getEditText().getSelectionStart());
                 break;
             case R.id.italic:
