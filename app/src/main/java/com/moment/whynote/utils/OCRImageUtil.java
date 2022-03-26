@@ -3,61 +3,39 @@ package com.moment.whynote.utils;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import android.provider.MediaStore;
-import android.util.Log;
 
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.tensorflow.lite.Interpreter;
-
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
-import static org.opencv.imgproc.Imgproc.drawContours;
-import static org.opencv.imgproc.Imgproc.rectangle;
-import static org.opencv.imgproc.Imgproc.resize;
+import static org.opencv.core.CvType.CV_8U;
+import static org.opencv.imgproc.Imgproc.COLOR_RGB2GRAY;
+import static org.opencv.imgproc.Imgproc.HoughLines;
+import static org.opencv.imgproc.Imgproc.LINE_AA;
+import static org.opencv.imgproc.Imgproc.THRESH_BINARY;
+import static org.opencv.imgproc.Imgproc.getRotationMatrix2D;
+import static org.opencv.imgproc.Imgproc.line;
+import static org.opencv.imgproc.Imgproc.threshold;
+import static org.opencv.imgproc.Imgproc.warpAffine;
 
 
 public class OCRImageUtil {
     @SuppressLint("StaticFieldLeak")
     private static Context mContext = null;
-    private final LinkedList<Mat> matQueue = new LinkedList<>();
-    private final LinkedList<Bitmap> bitmaps = new LinkedList<>();
     @SuppressLint("StaticFieldLeak")
     private static final OCRImageUtil instance = null;
-    private final int[] dims = {1, 30, 30, 1};
-    private final float[][] out = new float[1][3755];
-    private final Interpreter tfLite;
-    private static final String MODEL_PATH = "model2.tflite";
-    private static final char[] labels = new char[3755];
-    StringBuffer strBuffer = new StringBuffer();
 
     /**
      * 获取单例
@@ -80,24 +58,8 @@ public class OCRImageUtil {
     /**
      * 初始化OCRImageUtil
      */
-    public OCRImageUtil(Context mContext) throws IOException {
-        tfLite = new Interpreter(loadModelFile(mContext));
+    public OCRImageUtil(Context mContext) {
         OCRImageUtil.mContext = mContext;
-        getLabels();
-    }
-
-    /**
-     * 加载模型
-     *
-     * @return ByteBuffer
-     */
-    private ByteBuffer loadModelFile(Context mContext) throws IOException {
-        AssetFileDescriptor fileDescriptor = mContext.getAssets().openFd(MODEL_PATH);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
 
@@ -113,6 +75,7 @@ public class OCRImageUtil {
         String text = "";
         try {
             bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            bitmap = pretreatment(bitmap);
             TessBaseAPI tessBaseAPI = new TessBaseAPI();
             tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "myocr");
             tessBaseAPI.setImage(bitmap);
@@ -124,224 +87,64 @@ public class OCRImageUtil {
         return text;
     }
 
-    /**
-     * OCR识别
-     * 获取精度最高的标签
-     */
-    private String ocr() {
-
-        for (Bitmap bitmap : bitmaps) {
-            //把原图缩放成我们需要的图片大小
-            Bitmap bm = Bitmap.createScaledBitmap(bitmap, dims[1], dims[2], false);
-            float[][][][] inputMat = getMatFloat(bm);
-            tfLite.run(inputMat, out);
-            float max = 0;
-            int cnt = 0;
-            int d = 0;
-            for (int i = 0; i < out[0].length; i++) {
-                if (max < out[0][i]) {
-                    max = out[0][i];
-                    d = cnt;
-                }
-                cnt++;
-            }
-            if (max >= 0.7f)
-                strBuffer.append(labels[d]);
-            else
-                strBuffer.append(' ');
-        }
-
-//        System.out.println(strBuffer.toString());
-        return strBuffer.toString();
-
-    }
 
     /**
-     * image util
-     *
-     * @param uri of image we choose
+     * 图片预处理
      */
-    public void proSrc2Gray(ContentResolver contentResolver, Uri uri) {
-        Mat grayMat = new Mat();
-        Bitmap srcBitmap;
-        Mat bin = new Mat();
-        Mat rgbMat = new Mat();
-        try {
-//            grayMat = Imgcodecs.imread(uri.getPath(), Imgcodecs.IMREAD_GRAYSCALE);
-            srcBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
-            Utils.bitmapToMat(srcBitmap,rgbMat);
-//            srcBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri));
-//            System.out.println(srcBitmap.getWidth() + " "+ srcBitmap.getHeight() + ";;; " + src2Bitmap.getWidth() + " "+ src2Bitmap.getHeight());
+    private Bitmap pretreatment(Bitmap bitmap) {
+        Mat rgb = new Mat();
+        Mat gray = new Mat();
+        Utils.bitmapToMat(bitmap, rgb);
+//        //降噪
+//        fastNlMeansDenoisingColored(rgb,mat,3,3,7,21);
 
-            //对图片进行灰度化
-//            Utils.bitmapToMat(srcBitmap, rgbMat);
-            Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
-            grayMat = houghLines(grayMat);
-            // 利用OTSU二值化，将文本行与背景分割
-            Imgproc.threshold(grayMat, bin, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
-            //通过形态学腐蚀，将分割出来的文字字符连接在一起
-            Mat rec = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, 20), new Point(-1, -1));
-            Mat dilate = new Mat();
-            Imgproc.erode(bin, dilate, rec);
-            Mat erode = new Mat();
-            Core.bitwise_not(dilate, erode);
-            // 提取文本行所在轮廓
-            List<MatOfPoint> counts = new ArrayList<>();
-            Mat hierarchy = new Mat();
-            Imgproc.findContours(erode, counts, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_TC89_L1, new Point(0, 0));
-            drawContours(erode, counts, -1, new Scalar(255, 0, 255), 1);
-            int bitmapMax = 0;
-            Mat kernel = new Mat(3, 3, CvType.CV_32FC1);
-            float[] arrayFloat = new float[]{0F, -1F, 0F, -1F, 5F, -1F, 0F, -1F, 0F};
-            kernel.put(0, 0, arrayFloat);
-            List<Rect> axisX = new ArrayList<>(counts.size());
-            for (MatOfPoint matOfPoint : counts) {
-                if (Imgproc.contourArea(matOfPoint) < 200)
-                    continue;
-                Rect cntRect = Imgproc.boundingRect(matOfPoint);
-                int index;
-                for (index = 0; index < axisX.size(); index++) {
-                    if (axisX.get(index).x > cntRect.x) {
-                        break;
-                    }
-                }
-                axisX.add(index, cntRect);
-            }
-            List<Rect> axisY = new ArrayList<>(axisX.size());
-            for (Rect x : axisX) {
-                int index;
-                for (index = 0; index < axisY.size(); index++) {
-                    if (axisY.get(index).y > x.y + 10) {
-                        break;
-                    }
-                }
-                axisY.add(index, x);
-            }
+        Imgproc.cvtColor(rgb, gray, COLOR_RGB2GRAY);
+        Mat can = new Mat();
 
-            for (Rect rect : axisY) {
+        //二值化
+        threshold(gray, gray, 100, 255, THRESH_BINARY);
 
-                matQueue.add(grayMat.submat(rect));
-                Mat mat = matQueue.getLast();
-                resize(mat, mat, new Size(30, 30));
-                Bitmap bm = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888);
-                Core.bitwise_not(mat, mat);
-                if ((mat.width() / 2) > bitmapMax) {
-                    bitmapMax = mat.width() / 2;
-                }
-                if (mat.width() > bitmapMax && mat.height() > bitmapMax) {
-                    Imgproc.filter2D(mat,
-                            mat,
-                            -1,
-                            kernel,
-                            new Point(-1, -1),
-                            Core.BORDER_CONSTANT
-                    );
-                    Utils.matToBitmap(mat, bm);
-                    rectangle(grayMat, rect, new Scalar(34, 25, 25, 33), 1);
-                    bitmaps.add(bm);
-                }
-//                Bitmap bm = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
+        // 边缘提取+增强边缘
+        Imgproc.Canny(gray, can, 50, 200, 3);
+        Imgproc.Sobel(can, can, CV_8U, 1, 1,7);
 
-            }
-            System.out.println("the image is done" + bitmaps.size());
 
-        } catch (Exception e) {
-            Log.d("OCRImageUtil", e.getMessage());
-        }
-    }
-
-    /**
-     * 将 Mat 转换为 float[][][][]数组（输入格式）
-     *
-     * @return 返回数组
-     */
-    private float[][][][] getMatFloat(Bitmap bm) {
-        float[][][][] inFloat = new float[dims[0]][dims[1]][dims[2]][dims[3]];
-        //新建一个一维数组，长度是图片像素点的数量
-        int[] pixels = new int[dims[1] * dims[2]];
-
-        //把图片的每个像素点的值放到我们前面新建的一维数组中
-        bm.getPixels(pixels, 0, bm.getWidth(), 0, 0, dims[1], dims[2]);
-        int pixel = 0;
-        for (int i = 0; i < dims[1]; ++i) {
-            for (int j = 0; j < dims[2]; ++j) {
-                final int val = pixels[pixel++];
-                float gray = (val & 0xFF);
-                gray = gray / 255.0f;
-                float[] arr = {gray};
-                inFloat[0][i][j] = arr;
-            }
-        }
-        if (bm.isRecycled()) {
-            bm.recycle();
-        }
-        return inFloat;
-    }
-
-    public void getLabels() throws IOException {
-        InputStream ins = mContext.getAssets().open("labels.txt");
-        InputStreamReader reader = new InputStreamReader(ins, "GBK");
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        String line;
-        int i = 0;
-        while ((line = bufferedReader.readLine()) != null) {
-            //noinspection ResultOfMethodCallIgnored
-            line.replace(",", "");
-            for (int j = 0; j < line.length(); j++) {
-                if (!Character.isDigit(line.charAt(j))) {
-                    labels[i] = line.charAt(j);
-                }
-            }
-            i++;
-        }
-    }
-
-    /**
-     * 图形矫正
-     *
-     * @param mat 传入灰度图 Mat
-     * @return 返回矫正后的图片
-     */
-    public Mat houghLines(Mat mat) {
-        Mat backup = mat.clone();
+        //霍夫直线检测 (图片矫正)
         Mat lines = new Mat();
-        Imgproc.Canny(mat, lines, 100, 200, 3);
-        Imgproc.HoughLines(lines, lines, 1, Math.PI / 180.0, 200, 0, 0);
+        HoughLines(can, lines, 1, Math.PI / 180, 200, 0, 0);
         double sum = 0;
-        double angle;
-        for (int x = 0; x < lines.rows(); x++) {
-            double[] vec = lines.get(x, 0);
-
+        double angle = 0;
+        for (int i = 0; i < lines.rows(); i++) {
+            double[] vec = lines.get(i, 0);
             double rho = vec[0];
             double theta = vec[1];
-
-            Point pt1 = new Point();
-            Point pt2 = new Point();
-
-            double a = Math.cos(theta);
-            double b = Math.sin(theta);
-
-            double x0 = a * rho;
-            double y0 = b * rho;
-
-            pt1.x = Math.round(x0 + 1000 * (-b));
-            pt1.y = Math.round(y0 + 1000 * (a));
-            pt2.x = Math.round(x0 - 1000 * (-b));
-            pt2.y = Math.round(y0 - 1000 * (a));
+            Point pt1 = new Point(), pt2 = new Point();
+            double a = Math.cos(rho), b = Math.sin(theta);
+            double x = a * rho, y = b * theta;
+            pt1.x = Math.round(x + 1000 * (-b));
+            pt1.y = Math.round(y + 1000 * (a));
+            pt2.x = Math.round(x - 1000 * (-b));
+            pt2.y = Math.round(y - 1000 * (a));
             sum += theta;
-            Imgproc.line(mat, pt1, pt2, new Scalar(0, 0, 255), 1, Imgproc.LINE_4, 0);
+            line(gray, pt1, pt2, new Scalar(55, 100, 195), 1, LINE_AA);
+            double average = sum / lines.rows();
+            angle = Math.toDegrees(average) - 90;
         }
-        double average = sum / lines.rows(); //对所有角度求平均，这样做旋转效果会更好
-        angle = average / Math.PI * 180 - 90;
-        System.out.println("average:" + angle);
-        Point center = new Point();
-        center.x = mat.cols() / 2.0;
-        center.y = mat.rows() / 2.0;
 
-// 得到旋转矩阵算子
-        Mat matrix = Imgproc.getRotationMatrix2D(center, angle, 1);
-        Imgproc.warpAffine(backup, backup, matrix, backup.size(), 1, 0, new Scalar(0, 0, 0));
-        return backup;
+        Point center = new Point();
+        center.x = rgb.cols() / 2.0;
+        center.y = rgb.rows() / 2.0;
+        int length = (int) Math.sqrt(rgb.cols()*rgb.cols() + rgb.rows()*rgb.rows());
+        System.out.println(angle);
+        Mat m = getRotationMatrix2D(center, angle, 1);
+        Mat src_rotate = new Mat();
+        //仿射变换，背景色填充为白色
+        warpAffine(rgb, src_rotate, m, new Size(length, length), 1, 0, new Scalar(255, 255, 255));
+
+        Bitmap finalbitmap = Bitmap.createBitmap(src_rotate.width(), src_rotate.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(src_rotate, finalbitmap);
+        return finalbitmap;
+
     }
 
 }
