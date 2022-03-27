@@ -26,11 +26,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 长按自定义弹窗
- * 实现功能：
- * 复制内容、复制链接、分享链接、删除......
  */
 public class MenuFragment extends DialogFragment implements View.OnClickListener {
 
@@ -38,6 +38,7 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     private final ResRepository repository = ResRepository.getInstance();
     private Bundle bundle;
     private ResData data;
+    private static final String REGEX = "!\\[[^]]*]\\((?<filename>.*?)(?=[\")])(?<optionalpart>\".*\")?\\)";
 
 
     /**
@@ -96,6 +97,18 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
             }
             try {
                 OutputStream opt = new FileOutputStream(file, false);
+                Pattern p = Pattern.compile(REGEX);
+                Pattern fp = Pattern.compile(".+/(.+)$");
+                Matcher matcher = p.matcher(Objects.requireNonNull(data.desc)); // 获取 matcher 对象
+                while (matcher.find()){
+                    String text = matcher.group(1);
+                    assert text != null;
+                    Matcher m = fp.matcher(text);
+                    while (m.find()){
+                        String group = m.group(1);
+                        data.desc = data.desc.replace(text, "./" + group);
+                    }
+                }
                 opt.write(data.desc.getBytes());
                 opt.close();
             } catch (IOException e) {
