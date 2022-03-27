@@ -89,20 +89,24 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     public void onClick(View v) {
         Bundle bundle = new Bundle();
         if (v.getId() == R.id.btn_connect) {
-            bundle.putString("IP", etIpAddress.getText().toString());
-            bundle.putInt("PORT", Integer.parseInt(etPort.getText().toString()));
-            Intent intent = new Intent(getContext(), ControlService.class);
-            ArrayList list = new ArrayList();
-            list.add(resDataList);
-            bundle.putParcelableArrayList("LIST", list);
-            intent.putExtras(bundle);
-            getContext().startService(intent);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("IP", etIpAddress.getText().toString());
-            editor.putInt("PORT", Integer.parseInt(etPort.getText().toString()));
-            editor.apply();
+            upload(bundle);
             dismiss();
         }
+    }
+
+    public void upload(Bundle bundle) {
+        bundle.putString("IP", etIpAddress.getText().toString());
+        bundle.putInt("PORT", Integer.parseInt(etPort.getText().toString()));
+        Intent intent = new Intent(getContext(), ControlService.class);
+        ArrayList list = new ArrayList();
+        list.add(resDataList);
+        bundle.putParcelableArrayList("LIST", list);
+        intent.putExtras(bundle);
+        getContext().startService(intent);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("IP", etIpAddress.getText().toString());
+        editor.putInt("PORT", Integer.parseInt(etPort.getText().toString()));
+        editor.apply();
     }
 
     @Override

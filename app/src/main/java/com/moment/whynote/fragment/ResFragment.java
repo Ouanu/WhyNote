@@ -3,9 +3,7 @@ package com.moment.whynote.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import android.os.Bundle;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +12,11 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -32,9 +28,10 @@ import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.utils.DataUtils;
 import com.moment.whynote.view.OTextView;
 import com.moment.whynote.viewmodel.ResViewModel;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ResFragment extends Fragment implements View.OnClickListener {
@@ -52,6 +49,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     Bundle bundle;
 
     private static boolean showAnimate = true;
+    private ImageView uploadBtn;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -63,7 +61,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
             new Thread(() -> {
                 ResData newData = new ResData();
                 @SuppressLint("SdCardPath")
-                File file = new File(getString(R.string.ExternalStoragePath) , String.valueOf(newData.updateDate));
+                File file = new File(getString(R.string.ExternalStoragePath), String.valueOf(newData.updateDate));
                 if (!file.exists() || !file.isDirectory())
                     file.mkdirs();
                 newData.dirPath = file.getAbsolutePath();
@@ -93,13 +91,12 @@ public class ResFragment extends Fragment implements View.OnClickListener {
                 editor.putInt("LayoutManager", 0);
             }
             editor.apply();
-        } else if (v.getId() == R.id.title_2) {
+        } else if (v.getId() == R.id.upload_btn) {
             ConnectFragment connectFragment = new ConnectFragment();
             manager.beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
             connectFragment.show(manager, "NULL");
-
         }
     }
 
@@ -140,14 +137,15 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         recyclerView = view.findViewById(R.id.res_fragment_list);
         FloatingActionButton insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
+        uploadBtn = view.findViewById(R.id.upload_btn);
+        uploadBtn.setOnClickListener(this);
         ivChangeLayout = view.findViewById(R.id.iv_change_layout);
         ivChangeLayout.setOnClickListener(this);
         assert bundle != null;
         getLayoutManager(bundle.getInt("LayoutManager"));
         manager = this.getParentFragmentManager();
-        TextView title2 = view.findViewById(R.id.title_2);
-        title2.setOnClickListener(this);
         repository = ResRepository.getInstance();
+
     }
 
     /**
