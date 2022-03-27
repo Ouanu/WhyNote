@@ -3,20 +3,11 @@ package com.moment.whynote.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LifecycleRegistry;
 
 import com.moment.whynote.data.ResData;
-import com.moment.whynote.database.ResRepository;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +19,7 @@ public class ControlService extends Service{
 
     private Client client;
     private static final String TAG = "ControlService.class";
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private List<ResData> resDataList;
     // 标识服务被杀死后的行为
     int mStartMode;
@@ -47,11 +38,13 @@ public class ControlService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ArrayList list = intent.getExtras().getParcelableArrayList("LIST");
+        String ip = intent.getExtras().getString("IP");
+        int port = intent.getExtras().getInt("PORT");
         resDataList = (List<ResData>) list.get(0);
 //        executor.execute(()->client = Client.getInstance());
         executor.execute(()->{
             try {
-                client = new Client();
+                client = new Client(ip, port);
                 client.execute(resDataList);
                 Log.i(TAG, "onStartCommand: 正常运行");
 //                Toast.makeText(this, "onStartCommand: 正常运行", Toast.LENGTH_SHORT).show();

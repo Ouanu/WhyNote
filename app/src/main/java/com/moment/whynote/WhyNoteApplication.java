@@ -1,11 +1,11 @@
 package com.moment.whynote;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.moment.whynote.database.ResRepository;
-import com.moment.whynote.service.Client;
 import com.moment.whynote.utils.OCRImageUtil;
 
 import org.opencv.android.OpenCVLoader;
@@ -53,13 +53,15 @@ public class WhyNoteApplication extends Application {
     /**
      * 加载OCR模型及图片处理工具
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void getOCRImageUtil(){
         executor.execute(()->{
             // 将模型加载到目录中
             try {
                 InputStream inputStream = getAssets().open("myocr.traineddata");
-                File dir = new File("/sdcard/Android/data/com.moment.whynote/files/tesseract/tessdata");
+                @SuppressLint("SdCardPath") File dir = new File(getString(R.string.tesseract));
                 if (!dir.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
                     dir.mkdirs();
                 }
                 File file = new File(dir, "myocr.traineddata");
@@ -73,12 +75,8 @@ public class WhyNoteApplication extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                OCRImageUtil ocrImageUtil = new OCRImageUtil(this);
-                Log.i(TAG, "OCR ImageUtil is ready." + ocrImageUtil.hashCode());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            OCRImageUtil ocrImageUtil = new OCRImageUtil(this);
+            Log.i(TAG, "OCR ImageUtil is ready." + ocrImageUtil.hashCode());
         });
     }
 }

@@ -26,14 +26,14 @@ import java.util.List;
 
 public class Client {
 
-    private int port = 9250;
-    private String address = "192.168.137.1";
+//    private int port = 9250;
+//    private String address = "192.168.137.1";
     private Socket socket;
     private ResRepository repository = ResRepository.getInstance();
     private static volatile Client instance = null;
     private List<ResData> resDataList;
 
-    public Client() {
+    public Client(String address, int port) {
         try {
             socket = new Socket(address, port);
             Log.i("Client", "Client: socket=============");
@@ -42,16 +42,16 @@ public class Client {
         }
     }
 
-    public static Client getInstance() {
-        if (instance == null) {
-            synchronized (Client.class) {
-                if (instance == null) {
-                    return new Client();
-                }
-            }
-        }
-        return instance;
-    }
+//    public static Client getInstance() {
+//        if (instance == null) {
+//            synchronized (Client.class) {
+//                if (instance == null) {
+//                    return new Client();
+//                }
+//            }
+//        }
+//        return instance;
+//    }
 
 
     public void execute(List<ResData> resDataList) throws IOException {

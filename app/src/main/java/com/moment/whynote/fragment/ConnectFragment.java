@@ -2,6 +2,7 @@ package com.moment.whynote.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +13,6 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
@@ -22,9 +21,10 @@ import com.moment.whynote.service.ControlService;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 /**
@@ -34,12 +34,12 @@ import java.util.List;
  */
 public class ConnectFragment extends DialogFragment implements View.OnClickListener {
 
-
     private static final String TAG = "ConnectFragment";
     private EditText etIpAddress;
     private EditText etPort;
-    private ResRepository repository = ResRepository.getInstance();
+    private final ResRepository repository = ResRepository.getInstance();
     private List<ResData> resDataList;
+    private SharedPreferences sharedPreferences;
 
 
     @Override
@@ -56,13 +56,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        repository.getAllResData().observe(getViewLifecycleOwner(), new Observer<List<ResData>>() {
-            @Override
-            public void onChanged(List<ResData> resData) {
-                resDataList = resData;
-                Log.d(TAG, "onCreate: ++++++++++++" + resDataList.size());
-            }
-        });
+        repository.getAllResData().observe(getViewLifecycleOwner(), resData -> resDataList = resData);
     }
 
     /**
@@ -74,7 +68,11 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.connect_fragment, container, false);
         initView(view);
-
+        sharedPreferences = getContext().getSharedPreferences("setting", MODE_PRIVATE);
+        if (!sharedPreferences.getString("IP", "NULL").equals("NULL")) {
+            etIpAddress.setText(sharedPreferences.getString("IP", "NULL"));
+            etPort.setText(String.valueOf(sharedPreferences.getInt("PORT", 0)));
+        }
         return view;
     }
 
@@ -84,31 +82,32 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
         etPort = view.findViewById(R.id.et_port);
         Button btnConnect = view.findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(this);
-        Button btnDisconnect = view.findViewById(R.id.btn_disconnect);
-        btnDisconnect.setOnClickListener(this);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void onClick(View v) {
         Bundle bundle = new Bundle();
         if (v.getId() == R.id.btn_connect) {
+            bundle.putString("IP", etIpAddress.getText().toString());
+            bundle.putInt("PORT", Integer.parseInt(etPort.getText().toString()));
             Intent intent = new Intent(getContext(), ControlService.class);
             ArrayList list = new ArrayList();
             list.add(resDataList);
             bundle.putParcelableArrayList("LIST", list);
             intent.putExtras(bundle);
             getContext().startService(intent);
-            dismiss();
-        } else if (v.getId() == R.id.btn_disconnect) {
-            bundle.putString("command", "quit");
-//            connectCallback.onConnectSelected(resDataList);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("IP", etIpAddress.getText().toString());
+            editor.putInt("PORT", Integer.parseInt(etPort.getText().toString()));
+            editor.apply();
             dismiss();
         }
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy: delete========");
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
     }
 }

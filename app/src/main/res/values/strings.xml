@@ -12,4 +12,5 @@
     <string name="title_2">Note</string>
     <string name="resource_dcim">/data/user/0/com.moment.whynote/files/DCIM</string>
     <string name="ExternalStoragePath">/sdcard/Android/data/com.moment.whynote/files/Documents</string>
+    <string name="tesseract">/sdcard/Android/data/com.moment.whynote/files/tesseract/tessdata</string>
 </resources>
