@@ -93,6 +93,23 @@ public class OCRImageUtil {
     }
 
 
+    public String execute(Bitmap bitmap) {
+        String text = "";
+        try {
+//            bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            bitmap = pretreatment(bitmap);
+            TessBaseAPI tessBaseAPI = new TessBaseAPI();
+            tessBaseAPI.init("/sdcard/Android/data/com.moment.whynote/files/tesseract/", "myocr");
+            tessBaseAPI.setImage(bitmap);
+            text = tessBaseAPI.getUTF8Text();
+            tessBaseAPI.end();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return text;
+    }
+
+
     /**
      * 图片预处理
      */

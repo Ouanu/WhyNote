@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/AndroidStudioProjects/WhyNote/app/src/main/res/layout/long_click_menu.xml" value="0.12132725430597771" />
+        <entry key="..\:/AndroidStudioProjects/WhyNote/app/src/main/res/layout/picture_fragment.xml" value="0.20153985507246377" />
+        <entry key="..\:/AndroidStudioProjects/WhyNote/app/src/main/res/layout/tool_bar.xml" value="0.12132725430597771" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

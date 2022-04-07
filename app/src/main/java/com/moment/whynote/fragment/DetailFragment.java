@@ -195,9 +195,19 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
                 break;
             case R.id.btn_ocr:
                 startSelect = etDesc.getEditText().getSelectionStart();
-                mGetContent.launch("image/*");
-                chosingPic = true;
-                isOCR = true;
+//                mGetContent.launch("image/*");
+//                chosingPic = true;
+//                isOCR = true;
+                PictureFragment pictureFragment = new PictureFragment();
+                getParentFragmentManager().beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
+                pictureFragment.show(getParentFragmentManager(), "NULL");
+                if (startSelect == -1) {
+                    etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
+                } else {
+                    etDesc.getEditText().getText().insert(startSelect, text);
+                }
             default:
                 break;
         }
@@ -212,6 +222,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
             oToolItem.applyOMDTool();
         }
     }
+
 
     private class DetailHandler extends Handler {
 
