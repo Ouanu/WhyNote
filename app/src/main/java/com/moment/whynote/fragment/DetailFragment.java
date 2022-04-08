@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleObserver;
 
@@ -81,6 +82,23 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getParentFragmentManager().setFragmentResultListener("key", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                text = result.getString("orc_text");
+                if (startSelect == -1) {
+                    etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
+                } else {
+                    etDesc.getEditText().getText().insert(startSelect, text);
+                }
+
+            }
+        });
     }
 
     @Nullable
@@ -203,11 +221,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
                 pictureFragment.show(getParentFragmentManager(), "NULL");
-                if (startSelect == -1) {
-                    etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
-                } else {
-                    etDesc.getEditText().getText().insert(startSelect, text);
-                }
             default:
                 break;
         }
@@ -273,12 +286,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
                         chosingPic = false;
                     }
 
-                } else {
-                    isOCR = false;
-                    getParentFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
-                    waitingFragment.show(getParentFragmentManager(), null);
-                    executor.execute(new OCRTask(result));
                 }
             }
 
@@ -344,24 +351,24 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     /**
      * OCR获取结果
      */
-    private class OCRTask implements Runnable {
-
-        private Uri result;
-
-        public OCRTask(Uri result) {
-            this.result = result;
-        }
-
-        @Override
-        public void run() {
-            try {
-                text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            handler.sendEmptyMessage(OCR_IS_DONE);
-        }
-    }
+//    private class OCRTask implements Runnable {
+//
+//        private Uri result;
+//
+//        public OCRTask(Uri result) {
+//            this.result = result;
+//        }
+//
+//        @Override
+//        public void run() {
+//            try {
+//                text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            handler.sendEmptyMessage(OCR_IS_DONE);
+//        }
+//    }
 
 
     @Override
