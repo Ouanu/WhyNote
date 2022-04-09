@@ -1,15 +1,13 @@
 package com.moment.whynote.fragment;
 
 import android.Manifest;
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -31,9 +28,6 @@ import androidx.fragment.app.FragmentTransaction;
 import com.moment.whynote.R;
 import com.moment.whynote.utils.OCRImageUtil;
 
-import org.opencv.android.Utils;
-import org.tensorflow.lite.support.metadata.schema.Content;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,10 +39,8 @@ import java.util.concurrent.Executors;
 public class PictureFragment extends DialogFragment implements View.OnClickListener {
     private Button btnCamera;
     private Button btnGallery;
-    private String text;
-    private final String filePath = "/sdcard/Android/data/com.moment.whynote/files/output_image.jpg";
     private final Executor executor = Executors.newSingleThreadExecutor();
-    private WaitingFragment waitingFragment = new WaitingFragment();
+    private final WaitingFragment waitingFragment = new WaitingFragment();
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -82,52 +74,78 @@ public class PictureFragment extends DialogFragment implements View.OnClickListe
     public void onClick(View v) {
         if (v == btnCamera) {
             requestPermission();
+            @SuppressLint("SdCardPath")
             File file = new File("/sdcard/Android/data/com.moment.whynote/files/output_image.jpg");
             if (file.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
             try {
+                //noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Uri imageUri = FileProvider.getUriForFile(getContext(), "com.moment.whynote.WhyNoteApplication.fileProvider", file);
+            Uri imageUri = FileProvider.getUriForFile(requireContext(), "com.moment.whynote.WhyNoteApplication.fileProvider", file);
             mGetPicture.launch(imageUri);
             //            this.dismiss();
+        } else if (v == btnGallery) {
+            mGetContent.launch("image/*");
         }
     }
 
     //动态请求权限
     private void requestPermission() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             //请求权限
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         }
     }
 
 
-
     // Activity返回结果
     private final ActivityResultLauncher<Uri> mGetPicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
-//            getParentFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                    .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
-//            waitingFragment.show(getParentFragmentManager(), null);
         if (result) {
+            showWaiting();
+            @SuppressLint("SdCardPath")
             File file = new File("/sdcard/Android/data/com.moment.whynote/files/output_image.jpg");
             try {
                 Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
                 Log.i("BITMAP>SIZE", "onActivityResult: " + bitmap.getWidth() + " " + bitmap.getHeight());
-//                executor.execute(new OCRTask(bitmap));
-                new Thread(new OCRTask(bitmap)).start();
+                executor.execute(new OCRTask(bitmap));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         } else {
-            Log.i("TAKE_PHOTO=====", "FALSE");
+            Log.i("TAKE_PHOTO", "FALSE");
         }
 
-//            executor.execute(new OCRTask(result));
     });
+
+    //显示等待界面
+    private void showWaiting() {
+        getParentFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .setCustomAnimations(R.anim.no_slide, R.anim.from_bottom);
+        waitingFragment.show(getParentFragmentManager(), null);
+    }
+
+    // Activity返回结果
+    private final ActivityResultLauncher<String> mGetContent = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            result -> {
+                if (result != null) {
+                    showWaiting();
+                }
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), result);
+                    executor.execute(new OCRTask(bitmap));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+    );
 
 
     /**
@@ -135,7 +153,7 @@ public class PictureFragment extends DialogFragment implements View.OnClickListe
      */
     private class OCRTask implements Runnable {
 
-        private Bitmap result;
+        private final Bitmap result;
 
         public OCRTask(Bitmap result) {
             this.result = result;
@@ -145,16 +163,20 @@ public class PictureFragment extends DialogFragment implements View.OnClickListe
         public void run() {
 
             try {
-                text = OCRImageUtil.getInstance().execute(result);
-                Log.i("PictureFragment", "run: =========" + text);
+                String text = OCRImageUtil.getInstance().execute(result);
                 Bundle bundle = new Bundle();
-                bundle.putString("ocr_text", text);
+                bundle.putString("orc_text", text);
                 getParentFragmentManager().setFragmentResult("key", bundle);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            waitingFragment.dismiss();
+            waitingFragment.dismiss();
+            finished();
         }
+    }
+
+    private void finished() {
+        this.dismiss();
     }
 
 

@@ -36,7 +36,6 @@ import com.moment.oetlib.view.tools.OToolItem;
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
-import com.moment.whynote.utils.OCRImageUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -74,8 +73,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     private Bitmap bitmap;
     private String DcimPath = "";
     private static int startSelect;
-    private boolean chosingPic = false;
-    private boolean isOCR = false;
+    private static boolean chosingPic = false;
     private String text = "";
     private WaitingFragment waitingFragment = new WaitingFragment();
 
@@ -90,13 +88,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
         getParentFragmentManager().setFragmentResultListener("key", this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                Log.i("DetailFragment_fragment_result", "onFragmentResult: ");
+                // 当OCR完成时，获取识别字符串，更新显示
                 text = result.getString("orc_text");
-                if (startSelect == -1) {
-                    etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
-                } else {
-                    etDesc.getEditText().getText().insert(startSelect, text);
-                }
-
+                handler.sendEmptyMessage(OCR_IS_DONE);
             }
         });
     }
@@ -158,8 +153,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
         btnGetUri.setOnClickListener(this);
         btnOCR.setOnClickListener(this);
 
-//        DcimPath = getContext().getApplicationContext().getFilesDir().getAbsolutePath() + "/DCIM";
-
         DcimPath = bundle.getString("dirPath");
     }
 
@@ -208,14 +201,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
             case R.id.btn_get_uri:
                 startSelect = etDesc.getEditText().getSelectionStart();
                 mGetContent.launch("image/*");
-                chosingPic = true;
-                isOCR = false;
                 break;
             case R.id.btn_ocr:
                 startSelect = etDesc.getEditText().getSelectionStart();
-//                mGetContent.launch("image/*");
-//                chosingPic = true;
-//                isOCR = true;
                 PictureFragment pictureFragment = new PictureFragment();
                 getParentFragmentManager().beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -245,11 +233,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-//            super.handleMessage(msg);
             if (msg.what == DATA_IS_READY) {
                 applyTools();
             } else if(msg.what == OCR_IS_DONE) {
-                waitingFragment.dismiss();
                 if (startSelect == -1) {
                     etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), text);
                 } else {
@@ -264,28 +250,25 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
     private final ActivityResultLauncher<String> mGetContent = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
             result -> {
-                if (!isOCR) {
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), result);
-                        File saveFile = new File(DcimPath, System.currentTimeMillis() + ".jpg");
-                        FileOutputStream saveImgOut = new FileOutputStream(saveFile);
-                        // compress - 压缩的意思
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, saveImgOut);
-                        //存储完成后需要清除相关的进程
-                        saveImgOut.flush();
-                        saveImgOut.close();
-                        Log.d("Save Bitmap", "The picture is save to your phone!");
-                        if (startSelect == -1) {
-                            etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
-                        } else {
-                            etDesc.getEditText().getText().insert(startSelect, "\n![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        chosingPic = false;
+                try {
+                    if (result==null) return;
+                    bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), result);
+                    File saveFile = new File(DcimPath, System.currentTimeMillis() + ".jpg");
+                    FileOutputStream saveImgOut = new FileOutputStream(saveFile);
+                    // compress - 压缩的意思
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, saveImgOut);
+                    //存储完成后需要清除相关的进程
+                    saveImgOut.flush();
+                    saveImgOut.close();
+                    Log.d("Save Bitmap", "The picture is save to your phone!");
+                    if (startSelect == -1) {
+                        etDesc.getEditText().getText().insert(etDesc.getEditText().getText().length(), "![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
+                    } else {
+                        etDesc.getEditText().getText().insert(startSelect, "![Image](" + Uri.fromFile(saveFile) + "\"Image\")\n");
                     }
-
+                    chosingPic = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -346,29 +329,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener, Li
             }
         }
     }
-
-
-    /**
-     * OCR获取结果
-     */
-//    private class OCRTask implements Runnable {
-//
-//        private Uri result;
-//
-//        public OCRTask(Uri result) {
-//            this.result = result;
-//        }
-//
-//        @Override
-//        public void run() {
-//            try {
-//                text = OCRImageUtil.getInstance().execute(getActivity().getContentResolver(), result);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            handler.sendEmptyMessage(OCR_IS_DONE);
-//        }
-//    }
 
 
     @Override

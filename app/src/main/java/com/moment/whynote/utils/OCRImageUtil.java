@@ -127,7 +127,6 @@ public class OCRImageUtil {
         for (int i = 0; i < rgbList.size(); i++) {
             Mat can = new Mat();
             Mat finalMat = new Mat();
-            System.out.println("++++++++++++++++");
             Imgproc.GaussianBlur(rgbList.get(i), can, new Size(3, 3), 0, 0);
             Imgproc.Laplacian(can, finalMat, CV_8U);
             Core.add(rgbList.get(i), finalMat, rgbList.get(i));
