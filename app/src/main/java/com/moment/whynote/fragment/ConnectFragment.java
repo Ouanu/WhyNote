@@ -13,14 +13,11 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-
 import com.moment.whynote.R;
 import com.moment.whynote.data.ResData;
 import com.moment.whynote.database.ResRepository;
 import com.moment.whynote.service.ControlService;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +65,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.connect_fragment, container, false);
         initView(view);
-        sharedPreferences = getContext().getSharedPreferences("setting", MODE_PRIVATE);
+        sharedPreferences = requireContext().getSharedPreferences("setting", MODE_PRIVATE);
         if (!sharedPreferences.getString("IP", "NULL").equals("NULL")) {
             etIpAddress.setText(sharedPreferences.getString("IP", "NULL"));
             etPort.setText(String.valueOf(sharedPreferences.getInt("PORT", 0)));
@@ -84,7 +81,6 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
         btnConnect.setOnClickListener(this);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void onClick(View v) {
         Bundle bundle = new Bundle();
@@ -94,6 +90,7 @@ public class ConnectFragment extends DialogFragment implements View.OnClickListe
         }
     }
 
+    @SuppressWarnings("all")
     public void upload(Bundle bundle) {
         bundle.putString("IP", etIpAddress.getText().toString());
         bundle.putInt("PORT", Integer.parseInt(etPort.getText().toString()));

@@ -25,7 +25,7 @@ public class DirAndFileUtil {
      *
      * @param outputStream 输出流
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressWarnings("all")
     public void synchronizeFiles(DataInputStream inputStream, DataOutputStream outputStream) {
 
         int cnt;
@@ -48,7 +48,7 @@ public class DirAndFileUtil {
                 }
                 // 读取所有文件到该Key的队列当中
                 for (File file : Objects.requireNonNull(d.listFiles())) {
-                    dirAndFiles.get(d.getName()).add(file);
+                    Objects.requireNonNull(dirAndFiles.get(d.getName())).add(file);
                 }
             }
         }
@@ -69,10 +69,10 @@ public class DirAndFileUtil {
                 if (re.equals("文件夹创建失败")) continue;
                 System.out.println(re);
                 //要传送的文件数量
-                outputStream.writeInt(dirAndFiles.get(dirName).size());
+                outputStream.writeInt(Objects.requireNonNull(dirAndFiles.get(dirName)).size());
 
-                while (dirAndFiles.get(dirName).peek() != null) {
-                    if (sendFiles(outputStream, dirAndFiles.get(dirName).peek())) {
+                while (Objects.requireNonNull(dirAndFiles.get(dirName)).peek() != null) {
+                    if (sendFiles(outputStream, Objects.requireNonNull(dirAndFiles.get(dirName)).peek())) {
                         if (map.getOrDefault(Objects.requireNonNull(dirAndFiles.get(dirName).peek()).getName(), -1) != -1) {
                             map.remove(Objects.requireNonNull(dirAndFiles.get(dirName).peek()).getName());
                         }

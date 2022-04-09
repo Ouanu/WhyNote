@@ -2,36 +2,21 @@ package com.moment.whynote.service;
 
 
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewTreeLifecycleOwner;
-
 import com.moment.whynote.data.ResData;
-import com.moment.whynote.database.ResRepository;
-import com.moment.whynote.viewmodel.ResViewModel;
-
-import org.checkerframework.checker.units.qual.C;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Client {
 
-//    private int port = 9250;
-//    private String address = "192.168.137.1";
     private Socket socket;
-    private ResRepository repository = ResRepository.getInstance();
-    private static volatile Client instance = null;
-    private List<ResData> resDataList;
 
     public Client(String address, int port) {
         try {
@@ -41,18 +26,6 @@ public class Client {
             e.printStackTrace();
         }
     }
-
-//    public static Client getInstance() {
-//        if (instance == null) {
-//            synchronized (Client.class) {
-//                if (instance == null) {
-//                    return new Client();
-//                }
-//            }
-//        }
-//        return instance;
-//    }
-
 
     public void execute(List<ResData> resDataList) throws IOException {
         if (socket == null || !socket.isConnected()) {
@@ -85,32 +58,34 @@ public class Client {
             outputStream.writeInt(idList.size());
             for (Long aLong : idList.keySet()) {
                 outputStream.writeLong(aLong);
-                outputStream.writeLong(idList.get(aLong).updateDate);
+                outputStream.writeLong(Objects.requireNonNull(idList.get(aLong)).updateDate);
                 if (inputStream.readInt() == 999) {
                     if (inputStream.readBoolean()) {
-                        outputStream.writeUTF(idList.get(aLong).dirName);
+                        outputStream.writeUTF(Objects.requireNonNull(idList.get(aLong)).dirName);
                         if (inputStream.readUTF().equals("文件夹创建失败")) {
                             continue;
                         }
-                        File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/" + idList.get(aLong).dirName);
+                        @SuppressLint("SdCardPath")
+                        File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/" + Objects.requireNonNull(idList.get(aLong)).dirName);
                         String[] list = dir.list();
+                        assert list != null;
                         outputStream.writeInt(list.length);
-                        for (File file : dir.listFiles()) {
+                        for (File file : Objects.requireNonNull(dir.listFiles())) {
                             util.sendFiles(outputStream, file);
                         }
                         isChange = true;
-                    } else {
-                        continue;
                     }
                 } else {
-                    outputStream.writeUTF(idList.get(aLong).dirName);
+                    outputStream.writeUTF(Objects.requireNonNull(idList.get(aLong)).dirName);
                     if (inputStream.readUTF().equals("文件夹创建失败")) {
                         continue;
                     }
-                    File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/" + idList.get(aLong).dirName);
+                    @SuppressLint("SdCardPath")
+                    File dir = new File("/sdcard/Android/data/com.moment.whynote/files/Documents/" + Objects.requireNonNull(idList.get(aLong)).dirName);
                     String[] list = dir.list();
+                    assert list != null;
                     outputStream.writeInt(list.length);
-                    for (File file : dir.listFiles()) {
+                    for (File file : Objects.requireNonNull(dir.listFiles())) {
                         util.sendFiles(outputStream, file);
                     }
                     isChange = true;
@@ -120,14 +95,16 @@ public class Client {
             if (isChange) {
                 System.out.println("数据库需要更新");
                 System.out.println(inputStream.readUTF());
+                @SuppressLint("SdCardPath")
                 File sqlDir = new File("/data/data/com.moment.whynote/databases/");
-                outputStream.writeInt(sqlDir.list().length);
+                outputStream.writeInt(Objects.requireNonNull(sqlDir.list()).length);
 
                 if (sqlDir.exists()) {
                     File[] sqlFiles = sqlDir.listFiles();
+                    assert sqlFiles != null;
                     for (File file : sqlFiles) {
 //                    File sql = new File("/data/data/com.moment.whynote/databases/");
-                        Log.d("Client", "execute: " + file.getName());;
+                        Log.d("Client", "execute: " + file.getName());
                         util.sendFiles(outputStream, file);
                     }
                 }
@@ -138,22 +115,21 @@ public class Client {
 
         } else {
             util.synchronizeFiles(inputStream, outputStream);
+            @SuppressLint("SdCardPath")
             File sqlDir = new File("/data/data/com.moment.whynote/databases/");
-            outputStream.writeInt(sqlDir.listFiles().length);
+            outputStream.writeInt(Objects.requireNonNull(sqlDir.listFiles()).length);
 
             if (sqlDir.exists()) {
                 File[] sqlFiles = sqlDir.listFiles();
+                assert sqlFiles != null;
                 for (File file : sqlFiles) {
 //                    File sql = new File("/data/data/com.moment.whynote/databases/");
-                    Log.d("Client", "execute: " + file.getName());;
+                    Log.d("Client", "execute: " + file.getName());
                     util.sendFiles(outputStream, file);
                 }
             }
             System.out.println(inputStream.readUTF());
         }
-
-//        util.downloadFiles(outputStream, inputStream);
-//        outputStream.writeUTF("BYE");
         outputStream.close();
         inputStream.close();
         socket.close();

@@ -19,7 +19,10 @@ public class FloatViewUtil {
         this.context = context;
         if (height == 0) {
 //            Display display = context.getWindowManager().getDefaultDisplay();
-            Display display = context.getDisplay();
+            Display display = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                display = context.getDisplay();
+            }
             Point point = new Point();
             display.getSize(point);
             height = point.y;

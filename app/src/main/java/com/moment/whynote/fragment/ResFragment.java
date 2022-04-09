@@ -49,7 +49,6 @@ public class ResFragment extends Fragment implements View.OnClickListener {
     Bundle bundle;
 
     private static boolean showAnimate = true;
-    private ImageView uploadBtn;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -137,7 +136,7 @@ public class ResFragment extends Fragment implements View.OnClickListener {
         recyclerView = view.findViewById(R.id.res_fragment_list);
         FloatingActionButton insertBtn = view.findViewById(R.id.insert_btn);
         insertBtn.setOnClickListener(this);
-        uploadBtn = view.findViewById(R.id.upload_btn);
+        ImageView uploadBtn = view.findViewById(R.id.upload_btn);
         uploadBtn.setOnClickListener(this);
         ivChangeLayout = view.findViewById(R.id.iv_change_layout);
         ivChangeLayout.setOnClickListener(this);

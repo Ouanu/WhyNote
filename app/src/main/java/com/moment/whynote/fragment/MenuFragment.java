@@ -119,17 +119,4 @@ public class MenuFragment extends DialogFragment implements View.OnClickListener
     }
 
 
-
-    //复制选项
-//    private void copyMethod(String desc) {
-//        if (null != requireContext().getSystemService(Context.CLIPBOARD_SERVICE)) {
-//            ClipboardManager manager = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-//            ClipData mClipData = ClipData.newPlainText("Label", desc);
-//            manager.setPrimaryClip(mClipData);
-//            Toast.makeText(getContext(), desc + " 已复制成功", Toast.LENGTH_SHORT).show();
-//        }
-//
-//    }
-
-
 }

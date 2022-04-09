@@ -3,6 +3,7 @@ package com.moment.whynote.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -21,12 +22,6 @@ public class ControlService extends Service{
     private static final String TAG = "ControlService.class";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private List<ResData> resDataList;
-    // 标识服务被杀死后的行为
-    int mStartMode;
-
-    IBinder mBinder;
-
-    boolean mAllowRebind;
 
     // 服务被创建时调用
     @Override
@@ -35,9 +30,10 @@ public class ControlService extends Service{
     }
 
     // 调用 startService() 启动服务时调用
+    @SuppressWarnings("all")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ArrayList list = intent.getExtras().getParcelableArrayList("LIST");
+        ArrayList<Parcelable> list = intent.getExtras().getParcelableArrayList("LIST");
         String ip = intent.getExtras().getString("IP");
         int port = intent.getExtras().getInt("PORT");
         resDataList = (List<ResData>) list.get(0);
